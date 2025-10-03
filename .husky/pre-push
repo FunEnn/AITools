@@ -1,0 +1,2 @@
+# Run build test before pushing
+npm run build

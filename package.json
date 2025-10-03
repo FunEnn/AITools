@@ -7,7 +7,18 @@
     "build": "next build",
     "start": "next start",
     "lint": "biome check",
-    "format": "biome format --write"
+    "format": "biome format --write",
+    "type-check": "tsc --noEmit",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "biome check --write",
+      "biome format --write"
+    ],
+    "*.{css,scss,md,json}": [
+      "biome format --write"
+    ]
   },
   "dependencies": {
     "@clerk/localizations": "^3.25.5",
@@ -15,7 +26,8 @@
     "lucide-react": "^0.544.0",
     "next": "15.5.4",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "react-markdown": "^10.1.0"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.0",
@@ -23,6 +35,8 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.3",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
