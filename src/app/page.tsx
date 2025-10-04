@@ -1,10 +1,9 @@
-import Hero from '@/components/Hero';
-import AiTools from '@/components/AiTools';
-import Testimonial from '@/components/Testimonial';
-import Plan from '@/components/Plan';
-import Footer from '@/components/Footer';
-import Navbar from '@/components/Navbar';
-
+import AiTools from "@/components/features/AiTools";
+import Hero from "@/components/features/Hero";
+import Plan from "@/components/features/Plan";
+import Testimonial from "@/components/features/Testimonial";
+import Footer from "@/components/layout/Footer";
+import Navbar from "@/components/layout/Navbar";
 
 export default function Home() {
   return (

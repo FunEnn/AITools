@@ -4,10 +4,18 @@ import { Protect } from "@clerk/nextjs";
 import { Gem, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { dummyCreationData } from "@/assets/assets";
-import CreationItem from "@/components/CreationItem";
+import CreationItem from "@/components/ui/CreationItem";
 
 export default function AIPage() {
-  const [creations, setCreations] = useState<any[]>([]);
+  const [creations, setCreations] = useState<
+    Array<{
+      id: number;
+      prompt: string;
+      type: string;
+      content: string;
+      created_at: string;
+    }>
+  >([]);
 
   useEffect(() => {
     const getDashboardData = async () => {
