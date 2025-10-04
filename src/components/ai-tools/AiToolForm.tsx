@@ -75,7 +75,7 @@ export default function AiToolForm<T = string | number | Option>({
       </div>
 
       {/* Input */}
-      <p className="mt-6 text-sm font-medium">{inputLabel}</p>
+      <p className="mt-4 text-sm font-medium">{inputLabel}</p>
       {inputType === "textarea" ? (
         <textarea
           className="w-full p-2 px-3 mt-2 outline-none text-sm rounded-md border border-gray-300"
@@ -150,7 +150,7 @@ export default function AiToolForm<T = string | number | Option>({
       {/* Button */}
       <button
         type="submit"
-        className={`w-full flex justify-center items-center gap-2 bg-gradient-to-r ${buttonGradientFrom} ${buttonGradientTo} text-white px-4 py-2 mt-6 text-sm rounded-lg cursor-pointer`}
+        className={`w-full flex justify-center items-center gap-2 bg-gradient-to-r ${buttonGradientFrom} ${buttonGradientTo} text-white px-4 py-2 mt-4 text-sm rounded-lg cursor-pointer`}
       >
         <ButtonIcon className="w-5" />
         {buttonText}

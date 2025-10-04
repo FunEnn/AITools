@@ -1,4 +1,12 @@
-import { Edit, Eraser, Hash, ImageIcon, Sparkles } from "lucide-react";
+import {
+  Edit,
+  Eraser,
+  FileText,
+  Hash,
+  ImageIcon,
+  Scissors,
+  Sparkles,
+} from "lucide-react";
 import type { FormConfig } from "./AiToolForm";
 
 export const articleFormConfig: FormConfig = {
@@ -89,4 +97,40 @@ export const backgroundRemovalFormConfig: FormConfig = {
   buttonText: "Remove background",
   buttonGradientFrom: "from-[#FF6B35]",
   buttonGradientTo: "to-[#FF0000]",
+};
+
+export const objectRemovalFormConfig: FormConfig = {
+  icon: Sparkles,
+  title: "Object Removal",
+  iconColor: "text-[#4A7AFF]",
+  inputLabel: "Describe object to remove",
+  inputPlaceholder: "e.g., car in background, tree from the image",
+  inputType: "textarea",
+  inputRows: 4,
+  optionsLabel: "",
+  options: [],
+  selectedColor: "text-blue-700",
+  selectedBgColor: "bg-blue-50",
+  buttonIcon: Scissors,
+  buttonText: "Remove object",
+  buttonGradientFrom: "from-[#4A7AFF]",
+  buttonGradientTo: "to-[#8E37EB]",
+};
+
+export const resumeReviewFormConfig: FormConfig = {
+  icon: Sparkles,
+  title: "Resume Review",
+  iconColor: "text-[#00D4AA]",
+  inputLabel: "Upload Resume",
+  inputPlaceholder: "No file chosen",
+  inputType: "file",
+  inputRows: 1,
+  optionsLabel: "",
+  options: [],
+  selectedColor: "text-green-700",
+  selectedBgColor: "bg-green-50",
+  buttonIcon: FileText,
+  buttonText: "Review Resume",
+  buttonGradientFrom: "from-[#00D4AA]",
+  buttonGradientTo: "to-[#00B4D8]",
 };
