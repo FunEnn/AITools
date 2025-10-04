@@ -1,4 +1,4 @@
-import { Edit, Hash, ImageIcon, Sparkles } from "lucide-react";
+import { Edit, Eraser, Hash, ImageIcon, Sparkles } from "lucide-react";
 import type { FormConfig } from "./AiToolForm";
 
 export const articleFormConfig: FormConfig = {
@@ -71,4 +71,22 @@ export const imageGenerationFormConfig: FormConfig = {
   buttonText: "Generate Image",
   buttonGradientFrom: "from-[#00AD25]",
   buttonGradientTo: "to-[#04FF50]",
+};
+
+export const backgroundRemovalFormConfig: FormConfig = {
+  icon: Sparkles,
+  title: "Background Removal",
+  iconColor: "text-[#FF6B35]",
+  inputLabel: "Upload image",
+  inputPlaceholder: "No file chosen",
+  inputType: "file",
+  inputRows: 1,
+  optionsLabel: "",
+  options: [],
+  selectedColor: "text-red-700",
+  selectedBgColor: "bg-red-50",
+  buttonIcon: Eraser,
+  buttonText: "Remove background",
+  buttonGradientFrom: "from-[#FF6B35]",
+  buttonGradientTo: "to-[#FF0000]",
 };

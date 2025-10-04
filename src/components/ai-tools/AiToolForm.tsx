@@ -13,7 +13,7 @@ export interface FormConfig {
   iconColor?: string;
   inputLabel: string;
   inputPlaceholder: string;
-  inputType?: "text" | "textarea";
+  inputType?: "text" | "textarea" | "file";
   inputRows?: number;
   optionsLabel: string;
   options: Option[] | string[];
@@ -83,6 +83,19 @@ export default function AiToolForm<T = string | number | Option>({
           value={inputValue}
           onChange={(e) => onInputChange(e.target.value)}
           rows={inputRows}
+          required
+        />
+      ) : inputType === "file" ? (
+        <input
+          type="file"
+          accept="image/*"
+          className="w-full p-2 px-3 mt-2 outline-none text-sm rounded-md border border-gray-300"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) {
+              onInputChange(file.name);
+            }
+          }}
           required
         />
       ) : (
