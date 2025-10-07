@@ -10,10 +10,14 @@ export default function Community() {
   const [creations, setCreations] = useState<
     Array<{
       id: number;
+      user_id: string;
       prompt: string;
-      content: string;
+      content: any;
+      type: string;
+      publish: boolean;
       likes: string[];
       created_at: string;
+      updated_at: string;
     }>
   >([]);
   const { user } = useUser();

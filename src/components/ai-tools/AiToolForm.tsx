@@ -33,6 +33,9 @@ interface AiToolFormProps<T = string | number | Option> {
   selectedValue: T;
   onSelect: (value: T) => void;
   children?: React.ReactNode;
+  loading?: boolean;
+  onFileChange?: (file: File | null) => void;
+  acceptFileTypes?: string;
 }
 
 export default function AiToolForm<T = string | number | Option>({
@@ -43,6 +46,9 @@ export default function AiToolForm<T = string | number | Option>({
   selectedValue,
   onSelect,
   children,
+  loading = false,
+  onFileChange,
+  acceptFileTypes = "image/*",
 }: AiToolFormProps<T>) {
   const {
     icon: Icon,
@@ -88,12 +94,15 @@ export default function AiToolForm<T = string | number | Option>({
       ) : inputType === "file" ? (
         <input
           type="file"
-          accept="image/*"
+          accept={acceptFileTypes}
           className="w-full p-2 px-3 mt-2 outline-none text-sm rounded-md border border-gray-300"
           onChange={(e) => {
             const file = e.target.files?.[0];
             if (file) {
               onInputChange(file.name);
+              onFileChange?.(file);
+            } else {
+              onFileChange?.(null);
             }
           }}
           required
@@ -150,10 +159,15 @@ export default function AiToolForm<T = string | number | Option>({
       {/* Button */}
       <button
         type="submit"
-        className={`w-full flex justify-center items-center gap-2 bg-gradient-to-r ${buttonGradientFrom} ${buttonGradientTo} text-white px-4 py-2 mt-4 text-sm rounded-lg cursor-pointer`}
+        disabled={loading}
+        className={`w-full flex justify-center items-center gap-2 bg-gradient-to-r ${buttonGradientFrom} ${buttonGradientTo} text-white px-4 py-2 mt-4 text-sm rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed`}
       >
-        <ButtonIcon className="w-5" />
-        {buttonText}
+        {loading ? (
+          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+        ) : (
+          <ButtonIcon className="w-5" />
+        )}
+        {loading ? "处理中..." : buttonText}
       </button>
     </form>
   );

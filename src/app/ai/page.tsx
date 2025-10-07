@@ -1,12 +1,13 @@
 "use client";
 
-import { Protect } from "@clerk/nextjs";
+import { Protect, useAuth } from "@clerk/nextjs";
 import { Gem, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { dummyCreationData } from "@/assets/assets";
 import CreationItem from "@/components/ui/CreationItem";
 
 export default function AIPage() {
+  const { getToken } = useAuth();
   const [creations, setCreations] = useState<
     Array<{
       id: number;
@@ -16,6 +17,10 @@ export default function AIPage() {
       created_at: string;
     }>
   >([]);
+
+  useEffect(() => {
+    getToken().then((token) => console.log(token));
+  }, [getToken]);
 
   useEffect(() => {
     const getDashboardData = async () => {
