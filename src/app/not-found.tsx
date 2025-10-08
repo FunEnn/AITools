@@ -11,34 +11,31 @@ export default function NotFound() {
 
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center px-4 bg-background">
-      <div className="max-w-2xl w-full text-center space-y-12">
+      <div className="max-w-md w-full text-center space-y-8">
         {/* Logo */}
         <Image
           src={assets.logo}
           alt="logo"
           className="w-24 sm:w-32 mx-auto cursor-pointer"
           onClick={() => router.push("/")}
+          width={128}
+          height={40}
+          priority
         />
 
         {/* 404 Text */}
-        <h1 className="text-7xl sm:text-9xl font-bold text-[--color-primary]">
-          404
-        </h1>
-
-        {/* Message */}
         <div className="space-y-4">
-          <h2 className="text-2xl sm:text-3xl font-semibold">页面未找到</h2>
-          <p className="text-lg opacity-80">
-            抱歉，您要访问的页面似乎不存在。可能是链接已过期或输入的地址有误。
-          </p>
+          <h1 className="text-6xl sm:text-8xl font-bold text-primary">404</h1>
+          <h2 className="text-xl font-medium text-gray-600">页面未找到</h2>
+          <p className="text-gray-500">抱歉，您要访问的页面不存在。</p>
         </div>
 
         {/* Action Button */}
         <Button
           onClick={() => router.push("/")}
-          className="bg-[--color-primary] hover:opacity-90 text-white px-8 py-6 rounded-xl text-lg flex items-center gap-2 mx-auto transition-opacity"
+          className="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-lg flex items-center gap-2 mx-auto"
         >
-          <Home className="w-5 h-5" />
+          <Home className="w-4 h-4" />
           返回首页
         </Button>
       </div>

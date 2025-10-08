@@ -8,7 +8,7 @@ export const upload = multer({
   limits: {
     fileSize: 10 * 1024 * 1024, // 限制文件大小为10MB
   },
-  fileFilter: (req, file, cb) => {
+  fileFilter: (_req, file, cb) => {
     // 允许图像文件和PDF文件
     if (
       file.mimetype.startsWith("image/") ||

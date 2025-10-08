@@ -55,7 +55,7 @@ class SMMSService {
    * @param {Object} options - 上传选项
    * @returns {Promise<string>} 返回图片URL
    */
-  async uploadFromUrl(imageUrl, options = {}) {
+  async uploadFromUrl(imageUrl, _options = {}) {
     try {
       // 先下载图片
       const imageResponse = await axios.get(imageUrl, {

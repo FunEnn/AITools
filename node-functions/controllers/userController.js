@@ -6,17 +6,17 @@ export const getUserCreations = async (req, res) => {
     const creations =
       await sql`SELECT * FROM creations WHERE user_id = ${userId} ORDER BY created_at DESC`;
     res.json({ success: true, data: creations });
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ success: false, message: "获取创作内容失败" });
   }
 };
 
-export const getPublishedCreations = async (req, res) => {
+export const getPublishedCreations = async (_req, res) => {
   try {
     const creations =
       await sql`SELECT * FROM creations WHERE publish = true ORDER BY created_at DESC`;
     res.json({ success: true, data: creations });
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ success: false, message: "获取已发布创作内容失败" });
   }
 };
@@ -51,7 +51,7 @@ export const toggleLikeCreation = async (req, res) => {
     await sql`UPDATE creations SET likes = ${formattedArray}::text[] WHERE id = ${id}`;
 
     res.json({ success: true, message, data: { likes: updatedLikes } });
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ success: false, message: "点赞操作失败" });
   }
 };

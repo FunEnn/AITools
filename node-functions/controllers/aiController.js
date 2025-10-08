@@ -1,7 +1,5 @@
 import { clerkClient } from "@clerk/express";
 import axios from "axios";
-import fs from "fs";
-import { createRequire } from "module";
 import sql from "../configs/db.js";
 import smms from "../configs/sm_ms.js";
 
@@ -404,9 +402,10 @@ export const resumeReview = async (req, res) => {
 
     // 读取PDF文件内容
     const dataBuffer = req.file.buffer;
-    const require = createRequire(import.meta.url);
-    const pdf = require("pdf-parse");
-    const pdfData = await pdf(dataBuffer);
+
+    // 使用 pdf-parse-new 解析 PDF
+    const { default: pdfParse } = await import("pdf-parse-new");
+    const pdfData = await pdfParse(dataBuffer);
 
     // 构建简历审查提示词
     const prompt = `请仔细审查以下简历，并提供建设性的反馈意见，包括：

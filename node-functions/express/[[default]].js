@@ -21,7 +21,7 @@ import { auth } from "../middlewares/auth.js";
 const app = express();
 
 // 添加日志中间件
-app.use((req, res, next) => {
+app.use((req, _res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
   next();
 });
@@ -31,7 +31,7 @@ app.use(express.json());
 app.use(clerkMiddleware());
 
 // 健康检查路由
-app.get("/", (req, res) => res.json({ message: "AI Tools API is running!" }));
+app.get("/", (_req, res) => res.json({ message: "AI Tools API is running!" }));
 
 // 需要认证的路由
 app.use(requireAuth());

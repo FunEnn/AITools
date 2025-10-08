@@ -92,7 +92,7 @@ request.interceptors.response.use(
       } else {
         // 业务错误
         const error = new Error(data.message || "请求失败");
-        (error as any).success = false;
+        (error as Error & { success?: boolean }).success = false;
         return Promise.reject(error);
       }
     }
@@ -109,20 +109,21 @@ request.interceptors.response.use(
 
     // 处理429错误 - 自动重试
     if (error.response?.status === 429) {
-      const config = error.config as any;
+      const config = error.config as { _retryCount?: number };
       if (config && !config._retryCount) {
         config._retryCount = 0;
       }
 
-      if (config && config._retryCount < RETRY_CONFIG.maxRetries) {
-        config._retryCount++;
-        const delay = RETRY_CONFIG.retryDelay * 2 ** (config._retryCount - 1);
+      if (config && (config._retryCount ?? 0) < RETRY_CONFIG.maxRetries) {
+        config._retryCount = (config._retryCount ?? 0) + 1;
+        const delay =
+          RETRY_CONFIG.retryDelay * 2 ** ((config._retryCount ?? 1) - 1);
         console.log(
           `🔄 请求重试 ${config._retryCount}/${RETRY_CONFIG.maxRetries}，${delay}ms后重试...`,
         );
 
         await new Promise((resolve) => setTimeout(resolve, delay));
-        return request(config);
+        return request(config as InternalAxiosRequestConfig);
       }
     }
 
@@ -132,7 +133,7 @@ request.interceptors.response.use(
       const timeoutError = new Error(
         "请求超时，AI生成可能需要更长时间，请稍后重试",
       );
-      (timeoutError as any).isTimeout = true;
+      (timeoutError as Error & { isTimeout?: boolean }).isTimeout = true;
       return Promise.reject(timeoutError);
     }
 
@@ -162,10 +163,11 @@ request.interceptors.response.use(
       }
 
       // 返回服务器错误信息
-      const errorMessage = (data as any)?.message || `请求失败 (${status})`;
+      const errorMessage =
+        (data as { message?: string })?.message || `请求失败 (${status})`;
       const customError = new Error(errorMessage);
-      (customError as any).status = status;
-      (customError as any).data = data;
+      (customError as Error & { status?: number }).status = status;
+      (customError as Error & { data?: unknown }).data = data;
       return Promise.reject(customError);
     }
 
@@ -183,48 +185,51 @@ request.interceptors.response.use(
 // 封装常用请求方法
 export const http = {
   // GET请求
-  get: <T = any>(
+  get: <T = unknown>(
     url: string,
-    params?: any,
+    params?: Record<string, unknown>,
     config?: AxiosRequestConfig,
   ): Promise<T> => {
     return request.get(url, { params, ...config });
   },
 
   // POST请求
-  post: <T = any>(
+  post: <T = unknown>(
     url: string,
-    data?: any,
+    data?: unknown,
     config?: AxiosRequestConfig,
   ): Promise<T> => {
     return request.post(url, data, config);
   },
 
   // PUT请求
-  put: <T = any>(
+  put: <T = unknown>(
     url: string,
-    data?: any,
+    data?: unknown,
     config?: AxiosRequestConfig,
   ): Promise<T> => {
     return request.put(url, data, config);
   },
 
   // DELETE请求
-  delete: <T = any>(url: string, config?: AxiosRequestConfig): Promise<T> => {
+  delete: <T = unknown>(
+    url: string,
+    config?: AxiosRequestConfig,
+  ): Promise<T> => {
     return request.delete(url, config);
   },
 
   // PATCH请求
-  patch: <T = any>(
+  patch: <T = unknown>(
     url: string,
-    data?: any,
+    data?: unknown,
     config?: AxiosRequestConfig,
   ): Promise<T> => {
     return request.patch(url, data, config);
   },
 
   // 文件上传
-  upload: <T = any>(
+  upload: <T = unknown>(
     url: string,
     formData: FormData,
     config?: AxiosRequestConfig,

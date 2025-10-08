@@ -13,7 +13,7 @@ export default function Community() {
       id: number;
       user_id: string;
       prompt: string;
-      content: any;
+      content: string;
       type: string;
       publish: boolean;
       likes: string[];
@@ -88,43 +88,53 @@ export default function Community() {
       <div className="bg-white h-full w-full rounded-xl overflow-y-scroll">
         {getPublishedCreations.loading ? (
           <div className="flex justify-center items-center h-full">
-            <span className="w-10 h-10 my-1 rounded-full border-3 border-primary border-t-transparent animate-spin"></span>
+            <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : creations.length === 0 ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="text-gray-500">暂无创作内容</div>
+          <div className="flex flex-col items-center justify-center h-64">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+              <Heart className="w-8 h-8 text-gray-400" />
+            </div>
+            <div className="text-gray-500 text-center">
+              <p className="text-lg font-medium mb-2">暂无社区创作</p>
+              <p className="text-sm">成为第一个分享创作的用户吧！</p>
+            </div>
           </div>
         ) : (
-          creations.map((creation) => (
-            <div
-              key={creation.id}
-              className="relative group inline-block pl-3 pt-3 w-full sm:max-w-1/2 lg:max-w-1/3"
-            >
-              <Image
-                src={creation.content}
-                alt=""
-                width={300}
-                height={200}
-                className="w-full h-full object-cover rounded-lg"
-              />
-              <div className="absolute bottom-0 top-0 right-0 left-3 flex gap-2 items-end justify-end group-hover:justify-between p-3 group-hover:bg-gradient-to-b from-transparent to-black/80 text-white rounded-lg">
-                <p className="text-sm hidden group-hover:block">
-                  {creation.prompt}
-                </p>
-                <div className="flex gap-1 items-center">
-                  <p>{creation.likes.length}</p>
-                  <Heart
-                    className={`min-w-5 h-5 hover:scale-110 cursor-pointer ${
-                      user && creation.likes.includes(user.id)
-                        ? "fill-red-500 text-red-600"
-                        : "text-white"
-                    }`}
-                    onClick={() => handleLike(creation.id)}
+          <div className="p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {creations.map((creation) => (
+                <div
+                  key={creation.id}
+                  className="group relative aspect-square overflow-hidden rounded-lg transform transition-all duration-300 hover:scale-105"
+                >
+                  <Image
+                    src={creation.content}
+                    alt=""
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
+                  <div className="absolute inset-0 flex gap-2 items-end justify-end group-hover:justify-between p-3 group-hover:bg-gradient-to-b from-transparent to-black/80 text-white rounded-lg transition-all duration-300">
+                    <p className="text-sm hidden group-hover:block">
+                      {creation.prompt}
+                    </p>
+                    <div className="flex gap-1 items-center">
+                      <p>{creation.likes.length}</p>
+                      <Heart
+                        className={`min-w-5 h-5 hover:scale-110 cursor-pointer ${
+                          user && creation.likes.includes(user.id)
+                            ? "fill-red-500 text-red-600"
+                            : "text-white"
+                        }`}
+                        onClick={() => handleLike(creation.id)}
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
-          ))
+          </div>
         )}
       </div>
     </div>

@@ -45,7 +45,11 @@ export default function AIPage() {
         <div className="flex justify-between items-center w-72 p-4 px-6 bg-white rounded-xl border border-gray-200">
           <div className="text-slate-600">
             <p className="text-sm">Total Creations</p>
-            <h2 className="text-xl font-semibold">{creations.length}</h2>
+            {getUserCreations.loading ? (
+              <div className="h-6 w-16 bg-gray-200 rounded animate-pulse"></div>
+            ) : (
+              <h2 className="text-xl font-semibold">{creations.length}</h2>
+            )}
           </div>
           <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#3588F2] to-[#0BB0D7] text-white flex justify-center items-center">
             <Sparkles className="w-5 text-white" />
@@ -72,15 +76,46 @@ export default function AIPage() {
       <div className="space-y-3">
         <p className="mt-6 mb-4">Recent Creations</p>
         {getUserCreations.loading ? (
-          <div className="flex justify-center items-center h-32">
-            <span className="w-10 h-10 my-1 rounded-full border-3 border-primary border-t-transparent animate-spin"></span>
+          <div className="space-y-4">
+            {/* 骨架屏加载效果 */}
+            {Array.from({ length: 3 }, (_, index) => (
+              <div
+                key={`skeleton-${Date.now()}-${index}`}
+                className="bg-white rounded-xl border border-gray-200 p-4 animate-pulse"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 bg-gray-200 rounded-lg"></div>
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+                  </div>
+                  <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+                </div>
+              </div>
+            ))}
           </div>
         ) : creations.length === 0 ? (
-          <div className="flex items-center justify-center h-32">
-            <div className="text-gray-500">暂无创作内容</div>
+          <div className="flex flex-col items-center justify-center h-64 bg-white rounded-xl border border-gray-200">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+              <Sparkles className="w-8 h-8 text-gray-400" />
+            </div>
+            <div className="text-gray-500 text-center">
+              <p className="text-lg font-medium mb-2">暂无创作内容</p>
+              <p className="text-sm">开始使用 AI 工具创建您的第一个作品吧！</p>
+            </div>
           </div>
         ) : (
-          creations.map((item) => <CreationItem key={item.id} item={item} />)
+          <div className="space-y-4">
+            {creations.map((item) => (
+              <div
+                key={item.id}
+                className="transform transition-all duration-300 hover:scale-[1.02]"
+              >
+                <CreationItem item={item} />
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </div>
