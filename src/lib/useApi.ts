@@ -10,15 +10,15 @@ interface UseApiState<T> {
   error: string | null;
 }
 
-interface UseApiReturn<T> extends UseApiState<T> {
-  execute: (...args: unknown[]) => Promise<T | null>;
+interface UseApiReturn<T, Args extends any[] = any[]> extends UseApiState<T> {
+  execute: (...args: Args) => Promise<T | null>;
   reset: () => void;
 }
 
 // 通用API Hook
-export function useApi<T = unknown>(
-  apiFunction: (...args: unknown[]) => Promise<T>,
-): UseApiReturn<T> {
+export function useApi<T = unknown, Args extends any[] = any[]>(
+  apiFunction: (...args: Args) => Promise<T>,
+): UseApiReturn<T, Args> {
   const [state, setState] = useState<UseApiState<T>>({
     data: null,
     loading: false,
@@ -26,7 +26,7 @@ export function useApi<T = unknown>(
   });
 
   const execute = useCallback(
-    async (...args: unknown[]): Promise<T | null> => {
+    async (...args: Args): Promise<T | null> => {
       setState((prev) => ({ ...prev, loading: true, error: null }));
 
       try {

@@ -35,12 +35,12 @@ export default function Page() {
 
     try {
       // 构建中文prompt模板字符串
-      const length = selectedLength;
+      const length = selectedLength.valueOf();
       const prompt = `请写一篇关于"${input}"的${length}字文章。要求内容详实、结构清晰、逻辑严谨。`;
 
       const result = await generateArticle.execute({
         prompt: prompt,
-        length: length,
+        length: length.toString(),
       });
 
       if (result?.success && result.content) {
