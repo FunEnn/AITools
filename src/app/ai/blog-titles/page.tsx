@@ -37,7 +37,7 @@ export default function Page() {
         prompt: prompt,
       });
 
-      if (result && result.success && result.content) {
+      if (result?.success && result.content) {
         setGeneratedContent(result.content);
         toast.success("标题生成成功！");
       } else {

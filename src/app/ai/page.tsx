@@ -1,13 +1,14 @@
 "use client";
 
-import { Protect, useAuth } from "@clerk/nextjs";
+import { Protect } from "@clerk/nextjs";
 import { Gem, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
-import { dummyCreationData } from "@/assets/assets";
+import toast from "react-hot-toast";
 import CreationItem from "@/components/ui/CreationItem";
+import { useUserApi } from "@/lib/useApi";
 
 export default function AIPage() {
-  const { getToken } = useAuth();
+  const { getUserCreations } = useUserApi();
   const [creations, setCreations] = useState<
     Array<{
       id: number;
@@ -19,15 +20,23 @@ export default function AIPage() {
   >([]);
 
   useEffect(() => {
-    getToken().then((token) => console.log(token));
-  }, [getToken]);
-
-  useEffect(() => {
-    const getDashboardData = async () => {
-      setCreations(dummyCreationData);
+    const fetchUserCreations = async () => {
+      try {
+        const result = await getUserCreations.execute();
+        if (result?.success && result.data) {
+          setCreations(result.data);
+        } else {
+          console.error("获取用户创作内容失败:", getUserCreations.error);
+          toast.error("获取创作内容失败，请重试");
+        }
+      } catch (error) {
+        console.error("获取创作内容时出错:", error);
+        toast.error("获取创作内容时出错，请重试");
+      }
     };
-    getDashboardData();
-  }, []);
+
+    fetchUserCreations();
+  }, [getUserCreations.error, getUserCreations.execute]);
 
   return (
     <div className="h-full overflow-y-scroll p-6">
@@ -62,9 +71,17 @@ export default function AIPage() {
       {/* Recent Creations */}
       <div className="space-y-3">
         <p className="mt-6 mb-4">Recent Creations</p>
-        {creations.map((item) => (
-          <CreationItem key={item.id} item={item} />
-        ))}
+        {getUserCreations.loading ? (
+          <div className="flex justify-center items-center h-32">
+            <span className="w-10 h-10 my-1 rounded-full border-3 border-primary border-t-transparent animate-spin"></span>
+          </div>
+        ) : creations.length === 0 ? (
+          <div className="flex items-center justify-center h-32">
+            <div className="text-gray-500">暂无创作内容</div>
+          </div>
+        ) : (
+          creations.map((item) => <CreationItem key={item.id} item={item} />)
+        )}
       </div>
     </div>
   );

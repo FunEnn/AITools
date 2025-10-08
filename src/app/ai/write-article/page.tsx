@@ -3,7 +3,6 @@
 import { Edit } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import Markdown from "react-markdown";
 import AiToolForm from "@/components/ai-tools/AiToolForm";
 import AiToolLayout from "@/components/ai-tools/AiToolLayout";
 import AiToolResult from "@/components/ai-tools/AiToolResult";
@@ -44,7 +43,7 @@ export default function Page() {
         length: length,
       });
 
-      if (result && result.success && result.content) {
+      if (result?.success && result.content) {
         setGeneratedContent(result.content);
         toast.success("文章生成成功！");
       } else {

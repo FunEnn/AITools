@@ -10,7 +10,7 @@ import { objectRemovalFormConfig } from "@/components/ai-tools/formConfigs";
 import { useAiApi } from "@/lib/useApi";
 
 export default function Page() {
-  const [fileName, setFileName] = useState("");
+  const [_fileName, setFileName] = useState("");
   const [description, setDescription] = useState("");
   const [generatedContent, setGeneratedContent] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -42,7 +42,7 @@ export default function Page() {
         object: description,
       });
 
-      if (result && result.success && result.content) {
+      if (result?.success && result.content) {
         setGeneratedContent(result.content);
         toast.success("对象移除成功！");
       } else {

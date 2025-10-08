@@ -8,6 +8,15 @@ export interface ApiResponse<T = any> {
   creations?: T[];
 }
 
+// 点赞响应类型
+export interface LikeResponse {
+  success: boolean;
+  message: string;
+  data?: {
+    likes: string[];
+  };
+}
+
 // 创作相关类型
 export interface Creation {
   id: number;
@@ -62,8 +71,8 @@ export const userApi = {
   },
 
   // 点赞/取消点赞创作
-  toggleLikeCreation: (id: number): Promise<ApiResponse> => {
-    return http.post("/user/toggle-like-creation", { id });
+  toggleLikeCreation: (id: number): Promise<LikeResponse> => {
+    return http.post(`/user/toggle-like-creation/${id}`);
   },
 };
 

@@ -1,6 +1,7 @@
 "use client";
 
 import type { LucideIcon } from "lucide-react";
+import Image from "next/image";
 import Markdown from "react-markdown";
 
 interface AiToolResultProps {
@@ -55,9 +56,11 @@ export default function AiToolResult({
         <div className="flex-1 p-4 overflow-y-auto">
           {isImage ? (
             <div className="flex flex-col items-center gap-4">
-              <img
+              <Image
                 src={content}
                 alt="生成的图像"
+                width={600}
+                height={400}
                 className="max-w-full h-auto rounded-lg shadow-lg"
                 onError={(e) => {
                   console.error("图片加载失败:", content);

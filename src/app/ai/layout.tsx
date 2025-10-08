@@ -20,8 +20,27 @@ export default function AILayout({ children }: AILayoutProps) {
   // 加载中状态
   if (!isLoaded) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-lg">Loading...</div>
+      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-slate-50 to-gray-100">
+        <div className="flex flex-col items-center space-y-4">
+          {/* 旋转的加载图标 */}
+          <div className="relative">
+            <div className="w-12 h-12 border-4 border-gray-200 border-t-primary rounded-full animate-spin"></div>
+            <div
+              className="absolute inset-0 w-12 h-12 border-4 border-transparent border-r-[#9234EA] rounded-full animate-spin"
+              style={{
+                animationDirection: "reverse",
+                animationDuration: "0.8s",
+              }}
+            ></div>
+          </div>
+          {/* 加载文字 */}
+          <div className="text-center">
+            <h3 className="text-lg font-semibold text-slate-700 mb-1">
+              正在加载
+            </h3>
+            <p className="text-sm text-gray-600">请稍候...</p>
+          </div>
+        </div>
       </div>
     );
   }

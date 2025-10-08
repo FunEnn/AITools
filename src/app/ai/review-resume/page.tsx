@@ -39,7 +39,7 @@ export default function Page() {
     try {
       const result = await reviewResume.execute(selectedFile);
 
-      if (result && result.success && result.content) {
+      if (result?.success && result.content) {
         setGeneratedContent(result.content);
         toast.success("简历审查完成！");
       } else {

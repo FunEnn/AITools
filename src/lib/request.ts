@@ -18,6 +18,12 @@ export const setTokenGetter = (tokenGetter: () => Promise<string | null>) => {
   getTokenFunction = tokenGetter;
 };
 
+// 重试配置
+const RETRY_CONFIG = {
+  maxRetries: 3,
+  retryDelay: 1000, // 1秒
+};
+
 // 创建axios实例
 const request: AxiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -50,12 +56,13 @@ request.interceptors.request.use(
       };
     }
 
-    console.log("🚀 发送请求:", {
-      url: config.url,
-      method: config.method,
-      params: config.params,
-      data: config.data,
-    });
+    // 开发环境下才打印请求日志
+    if (process.env.NODE_ENV === "development") {
+      console.log("🚀 发送请求:", {
+        url: config.url,
+        method: config.method,
+      });
+    }
 
     return config;
   },
@@ -68,11 +75,13 @@ request.interceptors.request.use(
 // 响应拦截器
 request.interceptors.response.use(
   (response: AxiosResponse) => {
-    console.log("✅ 响应成功:", {
-      url: response.config.url,
-      status: response.status,
-      data: response.data,
-    });
+    // 开发环境下才打印响应日志
+    if (process.env.NODE_ENV === "development") {
+      console.log("✅ 响应成功:", {
+        url: response.config.url,
+        status: response.status,
+      });
+    }
 
     // 统一处理响应数据
     const { data } = response;
@@ -91,13 +100,32 @@ request.interceptors.response.use(
 
     return data;
   },
-  (error: AxiosError) => {
+  async (error: AxiosError) => {
     console.error("❌ 响应错误:", {
       url: error.config?.url,
       status: error.response?.status,
       message: error.message,
       data: error.response?.data,
     });
+
+    // 处理429错误 - 自动重试
+    if (error.response?.status === 429) {
+      const config = error.config as any;
+      if (config && !config._retryCount) {
+        config._retryCount = 0;
+      }
+
+      if (config && config._retryCount < RETRY_CONFIG.maxRetries) {
+        config._retryCount++;
+        const delay = RETRY_CONFIG.retryDelay * 2 ** (config._retryCount - 1);
+        console.log(
+          `🔄 请求重试 ${config._retryCount}/${RETRY_CONFIG.maxRetries}，${delay}ms后重试...`,
+        );
+
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        return request(config);
+      }
+    }
 
     // 处理超时错误
     if (error.code === "ECONNABORTED" && error.message.includes("timeout")) {
@@ -123,6 +151,9 @@ request.interceptors.response.use(
           break;
         case 404:
           console.error("❌ 请求的资源不存在");
+          break;
+        case 429:
+          console.error("❌ 请求过于频繁，请稍后重试");
           break;
         case 500:
           console.error("❌ 服务器内部错误");

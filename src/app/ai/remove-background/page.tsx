@@ -33,7 +33,7 @@ export default function Page() {
     try {
       const result = await removeBackground.execute(selectedFile);
 
-      if (result && result.success && result.content) {
+      if (result?.success && result.content) {
         setGeneratedContent(result.content);
         toast.success("背景移除成功！");
       } else {

@@ -39,7 +39,7 @@ export default function Page() {
         publish: publish,
       });
 
-      if (result && result.success && result.content) {
+      if (result?.success && result.content) {
         setGeneratedContent(result.content);
         toast.success("图像生成成功！");
       } else {

@@ -1,13 +1,6 @@
 import { useAuth } from "@clerk/nextjs";
 import { useCallback, useEffect, useState } from "react";
-import {
-  api,
-  Creation,
-  GenerateArticleParams,
-  GenerateBlogTitleParams,
-  GenerateImageParams,
-  RemoveObjectParams,
-} from "./api";
+import { api } from "./api";
 import { setTokenGetter } from "./request";
 
 // 通用API Hook类型
@@ -41,7 +34,25 @@ export function useApi<T = any>(
         setState({ data: result, loading: false, error: null });
         return result;
       } catch (error: any) {
-        const errorMessage = error.message || "请求失败";
+        console.error("API调用失败:", error);
+
+        // 处理不同类型的错误
+        let errorMessage = "请求失败";
+
+        if (error.status === 429) {
+          errorMessage = "请求过于频繁，请稍后重试";
+        } else if (error.status === 401) {
+          errorMessage = "未授权，请重新登录";
+        } else if (error.status === 403) {
+          errorMessage = "权限不足";
+        } else if (error.status === 404) {
+          errorMessage = "请求的资源不存在";
+        } else if (error.status === 500) {
+          errorMessage = "服务器内部错误，请稍后重试";
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+
         setState((prev) => ({ ...prev, loading: false, error: errorMessage }));
         return null;
       }
@@ -71,6 +82,24 @@ export const useUserApi = () => {
 
   return {
     getUserCreations,
+    getPublishedCreations,
+    toggleLikeCreation,
+  };
+};
+
+// 社区相关Hooks（优化版）
+export const useCommunityApi = () => {
+  const { getToken } = useAuth();
+
+  // 设置token获取函数
+  useEffect(() => {
+    setTokenGetter(getToken);
+  }, [getToken]);
+
+  const getPublishedCreations = useApi(api.user.getPublishedCreations);
+  const toggleLikeCreation = useApi(api.user.toggleLikeCreation);
+
+  return {
     getPublishedCreations,
     toggleLikeCreation,
   };
