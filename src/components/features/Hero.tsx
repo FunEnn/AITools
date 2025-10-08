@@ -24,7 +24,7 @@ export default function Hero() {
       <div className="flex flex-wrap justify-center gap-4 text-sm max-sm:text-xs">
         <button
           type="button"
-          onClick={() => router.push("/ai/generate-images")}
+          onClick={() => router.push("/ai")}
           className="bg-primary text-white px-10 py-3 rounded-lg hover:scale-102 active:scale-95 transition cursor-pointer"
         >
           Start creating now

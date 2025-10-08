@@ -19,7 +19,7 @@ export default function Navbar() {
       <Image
         src={assets.logo}
         alt="logo"
-        className="w-32 sm:w-44 cursor-pointer"
+        className="w-24 sm:w-32 cursor-pointer"
         onClick={() => router.push("/")}
       />
       {user ? (

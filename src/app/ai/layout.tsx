@@ -62,7 +62,7 @@ export default function AILayout({ children }: AILayoutProps) {
           src={assets.logo}
           alt="Logo"
           onClick={() => router.push("/")}
-          className="cursor-pointer w-32 sm:w-44"
+          className="cursor-pointer w-24 sm:w-32"
         />
         {sidebar ? (
           <X

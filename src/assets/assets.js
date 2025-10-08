@@ -10,17 +10,23 @@ import arrow_icon from "./arrow_icon.svg";
 import gradientBackground from "./gradientBackground.png";
 import logo from "./logo.svg";
 import profile_img_1 from "./profile_img_1.png";
+import profile_img_2 from "./profile_img_2.png";
+import profile_img_3 from "./profile_img_3.png";
+import profile_img_4 from "./profile_img_4.png";
+import profile_img_5 from "./profile_img_5.png";
 import star_dull_icon from "./star_dull_icon.svg";
 import star_icon from "./star_icon.svg";
-import user_group from "./user_group.png";
 
 export const assets = {
   logo,
   gradientBackground,
-  user_group,
   star_icon,
   star_dull_icon,
   profile_img_1,
+  profile_img_2,
+  profile_img_3,
+  profile_img_4,
+  profile_img_5,
   arrow_icon,
 };
 
@@ -78,26 +84,26 @@ export const AiToolsData = [
 export const dummyTestimonialData = [
   {
     image: assets.profile_img_1,
-    name: "John Doe",
-    title: "Marketing Director, TechCorp",
+    name: "Gotoh Hitori",
+    title: "Guitar & Vocals, Kessoku Band",
     content:
-      "ContentAI has revolutionized our content workflow. The quality of the articles is outstanding, and it saves us hours of work every week.",
+      "ContentAI helped me overcome my social anxiety by letting me write blog posts about music without having to talk to people directly. It's a lifesaver!",
     rating: 4,
   },
   {
-    image: assets.profile_img_1,
-    name: "Jane Smith",
-    title: "Content Creator, TechCorp",
+    image: assets.profile_img_2,
+    name: "Ijichi Nijika",
+    title: "Drummer, Kessoku Band",
     content:
-      "ContentAI has made our content creation process effortless. The AI tools have helped us produce high-quality content faster than ever before.",
+      "As the band's leader, I use ContentAI to manage our band's social media presence. It helps us connect with fans while giving Bocchi her space!",
     rating: 5,
   },
   {
-    image: assets.profile_img_1,
-    name: "David Lee",
-    title: "Content Writer, TechCorp",
+    image: assets.profile_img_4,
+    name: "Kita Ikuyo",
+    title: "Bass Guitar, Kessoku Band",
     content:
-      "ContentAI has transformed our content creation process. The AI tools have helped us produce high-quality content faster than ever before.",
+      "ContentAI is starrrr-level amazing! It helps me write engaging posts about our performances and connect with our growing fanbase! ⭐",
     rating: 4,
   },
 ];
