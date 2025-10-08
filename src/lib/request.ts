@@ -7,8 +7,7 @@ import axios, {
 } from "axios";
 
 // 基础配置
-const BASE_URL =
-  process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3001/api";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "/express/api";
 
 // 动态获取token的函数
 let getTokenFunction: (() => Promise<string | null>) | null = null;
