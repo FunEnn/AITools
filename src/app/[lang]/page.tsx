@@ -23,7 +23,7 @@ export default async function Home({
       <AiTools dict={dict} lang={lang as Lang} />
       <Testimonial dict={dict} />
       <Plan dict={dict} />
-      <Footer dict={dict} />
+      <Footer dict={dict} lang={lang} />
     </>
   );
 }

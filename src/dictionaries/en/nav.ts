@@ -14,6 +14,14 @@ export const nav = {
   removeObject: "Remove Object",
   reviewResume: "Review Resume",
   plan: "Plan",
+  quickLinks: "Quick Links",
+  aboutUs: "About Us",
+  privacyPolicy: "Privacy Policy",
+  newsletter: "Newsletter",
+  newsletterDescription:
+    "Stay updated with our latest AI tools, tips, and exclusive offers.",
+  emailPlaceholder: "Enter your email",
+  subscribe: "Subscribe",
 } as const;
 
 export default nav;

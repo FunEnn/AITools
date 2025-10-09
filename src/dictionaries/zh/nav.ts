@@ -14,6 +14,13 @@ export const nav = {
   removeObject: "移除物体",
   reviewResume: "简历审核",
   plan: "计划",
+  quickLinks: "快速链接",
+  aboutUs: "关于我们",
+  privacyPolicy: "隐私政策",
+  newsletter: "邮件订阅",
+  newsletterDescription: "获取最新的AI工具、技巧和独家优惠信息。",
+  emailPlaceholder: "输入您的邮箱",
+  subscribe: "订阅",
 } as const;
 
 export default nav;

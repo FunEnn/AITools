@@ -1,8 +1,6 @@
 // This file is auto-generated. Do not edit manually.
-import type { Lang } from "@/i18n";
 
 export interface Dictionary {
-  locale: Lang;
   nav: {
     home: string;
     tools: string;
@@ -69,20 +67,16 @@ export interface Dictionary {
       description: string;
     };
   };
-  community: {
-    title: string;
-    description: string;
-  };
   testimonials: {
     title: string;
     description: string;
-    data: Array<{
-      id: number;
-      name: string;
-      title: string;
-      content: string;
-      rating: number;
-      image: string;
+    data: readonly Array<{
+      readonly id: number;
+      readonly name: string;
+      readonly title: string;
+      readonly content: string;
+      readonly rating: number;
+      readonly image: string;
     }>;
   };
   ai: {
@@ -233,5 +227,11 @@ export interface Dictionary {
         buttonText: string;
       };
     };
+  };
+  notFound: {
+    title: string;
+    heading: string;
+    description: string;
+    backToHome: string;
   };
 }
