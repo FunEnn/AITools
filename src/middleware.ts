@@ -12,12 +12,13 @@ export function middleware(request: NextRequest) {
 
   if (!pathnameHasLang) {
     // Redirect to the default language
-    return NextResponse.redirect(
-      new URL(
-        `/${defaultLang}${pathname === "/" ? "" : pathname}`,
-        request.url,
-      ),
+    const redirectUrl = new URL(
+      `/${defaultLang}${pathname === "/" ? "" : pathname}`,
+      request.url,
     );
+
+    // 确保重定向是永久性的，这对 SEO 和缓存很重要
+    return NextResponse.redirect(redirectUrl, { status: 301 });
   }
 }
 
