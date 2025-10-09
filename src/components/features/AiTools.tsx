@@ -2,9 +2,17 @@
 
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { AiToolsData as data } from "@/assets/assets";
+import { getAiToolsData } from "@/assets/assets";
+import type { Lang } from "@/i18n";
+import type { Dictionary } from "@/types/dictionary";
 
-export default function AiTools() {
+export default function AiTools({
+  dict,
+  lang,
+}: {
+  dict: Dictionary;
+  lang: Lang;
+}) {
   const router = useRouter();
   const { isSignedIn } = useUser();
 
@@ -12,16 +20,15 @@ export default function AiTools() {
     <div className="px-4 sm:px-20 xl:px-32 my-24">
       <div className="text-center">
         <h2 className="text-slate-700 text-[42px] font-semibold">
-          Powerful AI Tools
+          {dict.nav.tools}
         </h2>
         <p className="text-gray-500 max-w-lg mx-auto">
-          Everything you need to create, enhance, and optimize your content with
-          cutting-edge AI technology.
+          {dict.tools.blogTitles.description}
         </p>
       </div>
 
       <div className="flex flex-wrap mt-10 justify-center">
-        {data.map((tool) => (
+        {getAiToolsData(dict, lang).map((tool) => (
           <button
             key={tool.path}
             type="button"

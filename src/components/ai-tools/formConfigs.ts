@@ -9,75 +9,62 @@ import {
 } from "lucide-react";
 import type { FormConfig } from "./AiToolForm";
 
-export const articleFormConfig: FormConfig = {
+export const getArticleFormConfig = (dict: any): FormConfig => ({
   icon: Sparkles,
-  title: "文章生成器",
+  title: dict.ai.formConfigs.article.title,
   iconColor: "text-[#4A7AFF]",
-  inputLabel: "文章主题",
-  inputPlaceholder: "人工智能的未来发展...",
-  optionsLabel: "文章长度",
-  options: [
-    { text: "短篇（500-800字）", value: 800 },
-    { text: "中篇（800-1200字）", value: 1200 },
-    { text: "长篇（1200+字）", value: 1600 },
-  ],
+  inputLabel: dict.ai.formConfigs.article.inputLabel,
+  inputPlaceholder: dict.ai.formConfigs.article.inputPlaceholder,
+  optionsLabel: dict.ai.formConfigs.article.optionsLabel,
+  options: dict.ai.formConfigs.article.options,
   selectedColor: "text-blue-700",
   selectedBgColor: "bg-blue-50",
   buttonIcon: Edit,
-  buttonText: "生成文章",
+  buttonText: dict.ai.formConfigs.article.buttonText,
   buttonGradientFrom: "from-[#226BFF]",
   buttonGradientTo: "to-[#65ADFF]",
-};
+});
 
-export const blogTitlesFormConfig: FormConfig = {
+export const getBlogTitlesFormConfig = (dict: any): FormConfig => ({
   icon: Sparkles,
-  title: "博客标题生成器",
+  title: dict.ai.formConfigs.blogTitles.title,
   iconColor: "text-[#8E37EB]",
-  inputLabel: "博客主题",
-  inputPlaceholder: "人工智能的未来发展...",
-  optionsLabel: "博客分类",
-  options: ["综合", "科技", "商业", "健康", "生活", "教育", "旅游", "美食"],
+  inputLabel: dict.ai.formConfigs.blogTitles.inputLabel,
+  inputPlaceholder: dict.ai.formConfigs.blogTitles.inputPlaceholder,
+  optionsLabel: dict.ai.formConfigs.blogTitles.optionsLabel,
+  options: dict.ai.formConfigs.blogTitles.options,
   selectedColor: "text-purple-700",
   selectedBgColor: "bg-purple-50",
   buttonIcon: Hash,
-  buttonText: "生成标题",
+  buttonText: dict.ai.formConfigs.blogTitles.buttonText,
   buttonGradientFrom: "from-[#C341F6]",
   buttonGradientTo: "to-[#8E37EB]",
-};
+});
 
-export const imageGenerationFormConfig: FormConfig = {
+export const getImageGenerationFormConfig = (dict: any): FormConfig => ({
   icon: Sparkles,
-  title: "AI图像生成器",
+  title: dict.ai.formConfigs.imageGeneration.title,
   iconColor: "text-[#00AD25]",
-  inputLabel: "图像描述",
-  inputPlaceholder: "描述你想要生成的图像内容...",
+  inputLabel: dict.ai.formConfigs.imageGeneration.inputLabel,
+  inputPlaceholder: dict.ai.formConfigs.imageGeneration.inputPlaceholder,
   inputType: "textarea",
   inputRows: 4,
-  optionsLabel: "风格",
-  options: [
-    "写实风格",
-    "吉卜力风格",
-    "动漫风格",
-    "卡通风格",
-    "奇幻风格",
-    "超写实风格",
-    "3D风格",
-    "肖像风格",
-  ],
+  optionsLabel: dict.ai.formConfigs.imageGeneration.optionsLabel,
+  options: dict.ai.formConfigs.imageGeneration.options,
   selectedColor: "text-green-700",
   selectedBgColor: "bg-green-50",
   buttonIcon: ImageIcon,
-  buttonText: "生成图像",
+  buttonText: dict.ai.formConfigs.imageGeneration.buttonText,
   buttonGradientFrom: "from-[#00AD25]",
   buttonGradientTo: "to-[#04FF50]",
-};
+});
 
-export const backgroundRemovalFormConfig: FormConfig = {
+export const getBackgroundRemovalFormConfig = (dict: any): FormConfig => ({
   icon: Sparkles,
-  title: "背景移除",
+  title: dict.ai.formConfigs.backgroundRemoval.title,
   iconColor: "text-[#FF6B35]",
-  inputLabel: "上传图像",
-  inputPlaceholder: "未选择文件",
+  inputLabel: dict.ai.formConfigs.backgroundRemoval.inputLabel,
+  inputPlaceholder: dict.ai.formConfigs.backgroundRemoval.inputPlaceholder,
   inputType: "file",
   inputRows: 1,
   optionsLabel: "",
@@ -85,17 +72,17 @@ export const backgroundRemovalFormConfig: FormConfig = {
   selectedColor: "text-red-700",
   selectedBgColor: "bg-red-50",
   buttonIcon: Eraser,
-  buttonText: "移除背景",
+  buttonText: dict.ai.formConfigs.backgroundRemoval.buttonText,
   buttonGradientFrom: "from-[#FF6B35]",
   buttonGradientTo: "to-[#FF0000]",
-};
+});
 
-export const objectRemovalFormConfig: FormConfig = {
+export const getObjectRemovalFormConfig = (dict: any): FormConfig => ({
   icon: Sparkles,
-  title: "对象移除",
+  title: dict.ai.formConfigs.objectRemoval.title,
   iconColor: "text-[#4A7AFF]",
-  inputLabel: "描述要移除的对象",
-  inputPlaceholder: "例如：背景中的汽车，图像中的树木",
+  inputLabel: dict.ai.formConfigs.objectRemoval.inputLabel,
+  inputPlaceholder: dict.ai.formConfigs.objectRemoval.inputPlaceholder,
   inputType: "textarea",
   inputRows: 4,
   optionsLabel: "",
@@ -103,17 +90,17 @@ export const objectRemovalFormConfig: FormConfig = {
   selectedColor: "text-blue-700",
   selectedBgColor: "bg-blue-50",
   buttonIcon: Scissors,
-  buttonText: "移除对象",
+  buttonText: dict.ai.formConfigs.objectRemoval.buttonText,
   buttonGradientFrom: "from-[#4A7AFF]",
   buttonGradientTo: "to-[#8E37EB]",
-};
+});
 
-export const resumeReviewFormConfig: FormConfig = {
+export const getResumeReviewFormConfig = (dict: any): FormConfig => ({
   icon: Sparkles,
-  title: "简历审查",
+  title: dict.ai.formConfigs.resumeReview.title,
   iconColor: "text-[#00D4AA]",
-  inputLabel: "上传简历",
-  inputPlaceholder: "未选择文件",
+  inputLabel: dict.ai.formConfigs.resumeReview.inputLabel,
+  inputPlaceholder: dict.ai.formConfigs.resumeReview.inputPlaceholder,
   inputType: "file",
   inputRows: 1,
   optionsLabel: "",
@@ -121,7 +108,7 @@ export const resumeReviewFormConfig: FormConfig = {
   selectedColor: "text-green-700",
   selectedBgColor: "bg-green-50",
   buttonIcon: FileText,
-  buttonText: "审查简历",
+  buttonText: dict.ai.formConfigs.resumeReview.buttonText,
   buttonGradientFrom: "from-[#00D4AA]",
   buttonGradientTo: "to-[#00B4D8]",
-};
+});

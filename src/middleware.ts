@@ -1,12 +1,29 @@
-import { clerkMiddleware } from "@clerk/nextjs/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import { defaultLang, langs } from "./i18n";
 
-export default clerkMiddleware();
+export function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+
+  // Check if the pathname has a language prefix
+  const pathnameHasLang = langs.some(
+    (lang) => pathname.startsWith(`/${lang}/`) || pathname === `/${lang}`,
+  );
+
+  if (!pathnameHasLang) {
+    // Redirect to the default language
+    return NextResponse.redirect(
+      new URL(
+        `/${defaultLang}${pathname === "/" ? "" : pathname}`,
+        request.url,
+      ),
+    );
+  }
+}
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
-    "/(api|trpc)(.*)",
+    // Skip all internal paths (_next, api, etc)
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],
 };

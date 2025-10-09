@@ -15,24 +15,51 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { Dictionary } from "@/types/dictionary";
 
 interface SidebarProps {
   sidebar?: boolean;
   setSidebar?: (value: boolean) => void;
+  dict: Dictionary;
+  lang: string;
 }
 
-const navItems = [
-  { to: "/ai", label: "Dashboard", Icon: Home },
-  { to: "/ai/write-article", label: "Write Article", Icon: SquarePen },
-  { to: "/ai/blog-titles", label: "Blog Titles", Icon: Hash },
-  { to: "/ai/generate-images", label: "Generate Images", Icon: ImageIcon },
-  { to: "/ai/remove-background", label: "Remove Background", Icon: Eraser },
-  { to: "/ai/remove-object", label: "Remove Object", Icon: Scissors },
-  { to: "/ai/review-resume", label: "Review Resume", Icon: FileText },
-  { to: "/ai/community", label: "Community", Icon: Users },
-];
-
-export default function Sidebar({ sidebar, setSidebar }: SidebarProps) {
+export default function Sidebar({
+  sidebar,
+  setSidebar,
+  dict,
+  lang,
+}: SidebarProps) {
+  const navItems = [
+    { to: `/${lang}/ai`, label: dict.nav.dashboard, Icon: Home },
+    {
+      to: `/${lang}/ai/write-article`,
+      label: dict.nav.writeArticle,
+      Icon: SquarePen,
+    },
+    { to: `/${lang}/ai/blog-titles`, label: dict.nav.blogTitles, Icon: Hash },
+    {
+      to: `/${lang}/ai/generate-images`,
+      label: dict.nav.generateImages,
+      Icon: ImageIcon,
+    },
+    {
+      to: `/${lang}/ai/remove-background`,
+      label: dict.nav.removeBackground,
+      Icon: Eraser,
+    },
+    {
+      to: `/${lang}/ai/remove-object`,
+      label: dict.nav.removeObject,
+      Icon: Scissors,
+    },
+    {
+      to: `/${lang}/ai/review-resume`,
+      label: dict.nav.reviewResume,
+      Icon: FileText,
+    },
+    { to: `/${lang}/ai/community`, label: dict.nav.community, Icon: Users },
+  ];
   const { user } = useUser();
   const { signOut, openUserProfile } = useClerk();
   const pathname = usePathname();
@@ -55,7 +82,7 @@ export default function Sidebar({ sidebar, setSidebar }: SidebarProps) {
 
         <div className="px-6 mt-5 text-sm text-gray-600 font-medium">
           {navItems.map(({ to, label, Icon }) => {
-            const isActive = pathname === to;
+            const isActive = pathname.endsWith(to);
             return (
               <Link
                 key={to}
@@ -90,7 +117,7 @@ export default function Sidebar({ sidebar, setSidebar }: SidebarProps) {
               <Protect plan="premium" fallback="Free">
                 Premium
               </Protect>{" "}
-              Plan
+              {dict.nav.plan}
             </p>
           </div>
         </button>
