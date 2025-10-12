@@ -15,7 +15,10 @@ interface ReviewResumeClientProps {
   lang: Lang;
 }
 
-export default function ReviewResumeClient({ dict }: ReviewResumeClientProps) {
+export default function ReviewResumeClient({
+  dict,
+  lang,
+}: ReviewResumeClientProps) {
   const resumeReviewFormConfig = getResumeReviewFormConfig(dict);
   const [fileName, setFileName] = useState("");
   const [generatedContent, setGeneratedContent] = useState("");
@@ -38,7 +41,10 @@ export default function ReviewResumeClient({ dict }: ReviewResumeClientProps) {
     }
 
     try {
-      const result = await reviewResume.execute(selectedFile);
+      const result = await reviewResume.execute({
+        resume: selectedFile,
+        language: lang,
+      });
 
       if (result?.success && result.content) {
         setGeneratedContent(result.content);

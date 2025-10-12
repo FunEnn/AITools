@@ -56,6 +56,7 @@ export interface RemoveObjectParams {
 
 export interface ResumeReviewParams {
   resume: File;
+  language?: string;
 }
 
 // 用户相关API
@@ -125,7 +126,7 @@ export const aiApi = {
 
   // 简历审查
   reviewResume: (
-    resumeFile: File,
+    params: ResumeReviewParams,
   ): Promise<{
     success: boolean;
     content: string;
@@ -133,7 +134,10 @@ export const aiApi = {
     message?: string;
   }> => {
     const formData = new FormData();
-    formData.append("resume", resumeFile);
+    formData.append("resume", params.resume);
+    if (params.language) {
+      formData.append("language", params.language);
+    }
     return http.upload("/ai/resume-review", formData);
   },
 };

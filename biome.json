@@ -8,12 +8,14 @@
   "files": {
     "ignoreUnknown": true,
     "includes": [
-      "**/*.{js,jsx,ts,tsx,json,css,md}",
+      "**/*.{js,jsx,ts,tsx,json,css}",
       "!node_modules",
       "!.next",
       "!dist",
       "!build",
-      "!package-lock.json"
+      "!package-lock.json",
+      "!README.md",
+      "!node-functions/README.md"
     ]
   },
   "formatter": {

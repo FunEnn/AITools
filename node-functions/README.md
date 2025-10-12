@@ -1,27 +1,8 @@
-# Node Functions 迁移说明
+# Node Functions
 
 ## 概述
 
 EdgeOne Node Functions 后端代码。
-
-## 目录结构
-
-```
-node-functions/
-├── express/
-│   └── [[default]].js          # Express 应用主入口
-├── configs/
-│   ├── db.js                   # 数据库配置
-│   ├── multer.js               # 文件上传配置
-│   └── sm_ms.js                # SM.MS 图床服务
-├── middlewares/
-│   └── auth.js                 # 认证中间件
-├── controllers/
-│   ├── aiController.js         # AI 功能控制器
-│   └── userController.js       # 用户功能控制器
-├── test.js                     # 测试端点
-└── README.md                   # 说明文档
-```
 
 ## 路由映射
 

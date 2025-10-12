@@ -384,6 +384,7 @@ export const resumeReview = async (req, res) => {
   try {
     const { userId } = req.auth();
     const plan = req.plan;
+    const { language = "zh" } = req.body; // 获取语言参数，默认为中文
 
     if (plan !== "premium") {
       return res.json({
@@ -407,8 +408,23 @@ export const resumeReview = async (req, res) => {
     const { default: pdfParse } = await import("pdf-parse-new");
     const pdfData = await pdfParse(dataBuffer);
 
-    // 构建简历审查提示词
-    const prompt = `请仔细审查以下简历，并提供建设性的反馈意见，包括：
+    // 根据语言构建简历审查提示词
+    const isEnglish = language === "en";
+    const prompt = isEnglish
+      ? `Please carefully review the following resume and provide constructive feedback, including:
+
+1. Resume strengths and highlights
+2. Areas for improvement
+3. Format and structure suggestions
+4. Content completeness assessment
+5. Keyword optimization suggestions
+6. Overall rating (1-10 points)
+
+Resume content:
+${pdfData.text}
+
+Please respond in English and provide specific, practical suggestions.`
+      : `请仔细审查以下简历，并提供建设性的反馈意见，包括：
 
 1. 简历的优势和亮点
 2. 需要改进的地方

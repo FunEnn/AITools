@@ -15,7 +15,10 @@ interface BlogTitlesClientProps {
   lang: Lang;
 }
 
-export default function BlogTitlesClient({ dict }: BlogTitlesClientProps) {
+export default function BlogTitlesClient({
+  dict,
+  lang,
+}: BlogTitlesClientProps) {
   const blogTitlesFormConfig = getBlogTitlesFormConfig(dict);
   const [selectedCategory, setSelectedCategory] = useState(
     blogTitlesFormConfig.options[0],
@@ -40,9 +43,12 @@ export default function BlogTitlesClient({ dict }: BlogTitlesClientProps) {
     }
 
     try {
-      const prompt = dict.ai.blogTitles.promptTemplate
-        .replace("{topic}", input)
-        .replace("{category}", selectedCategory);
+      const language = lang === "zh" ? "中文" : "English";
+      const prompt =
+        dict.ai.blogTitles.promptTemplate
+          .replace("{topic}", input)
+          .replace("{category}", selectedCategory) +
+        ` 请用${language}生成标题。`;
 
       const result = await generateBlogTitle.execute({
         prompt: prompt,

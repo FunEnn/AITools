@@ -15,7 +15,10 @@ interface WriteArticleClientProps {
   lang: Lang;
 }
 
-export default function WriteArticleClient({ dict }: WriteArticleClientProps) {
+export default function WriteArticleClient({
+  dict,
+  lang,
+}: WriteArticleClientProps) {
   const articleFormConfig = getArticleFormConfig(dict);
   const [selectedLength, setSelectedLength] = useState(
     articleFormConfig.options[0],
@@ -43,9 +46,12 @@ export default function WriteArticleClient({ dict }: WriteArticleClientProps) {
     try {
       // 构建prompt模板字符串
       const length = selectedLength.valueOf();
-      const prompt = dict.ai.writeArticle.promptTemplate
-        .replace("{topic}", input)
-        .replace("{length}", length.toString());
+      const language = lang === "zh" ? "中文" : "English";
+      const prompt =
+        dict.ai.writeArticle.promptTemplate
+          .replace("{topic}", input)
+          .replace("{length}", length.toString()) +
+        ` 请用${language}生成文章内容。`;
 
       const result = await generateArticle.execute({
         prompt: prompt,
