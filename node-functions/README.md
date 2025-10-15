@@ -24,7 +24,7 @@ EdgeOne Node Functions 后端代码。
 
 ## 部署说明
 
-1. 确保所有依赖项已安装在 `client/package.json` 中
+1. 确保所有依赖项已安装在 `package.json` 中
 2. 设置必要的环境变量
 3. 将代码推送到 Git 仓库
 4. EdgeOne Pages 将自动构建和部署 Node Functions

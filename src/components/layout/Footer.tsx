@@ -19,10 +19,7 @@ export default function Footer({ dict, lang }: { dict: any; lang: string }) {
             height={40}
           />
           <p className="mt-6 text-sm opacity-60">
-            AI-tools is a powerful platform offering a suite of AI-powered tools
-            for content creation, image processing, and resume optimization.
-            Enhance your productivity and unleash creativity with our
-            intelligent solutions.
+            {dict.nav.footerDescription}
           </p>
         </div>
         <div className="flex-1 flex flex-col sm:flex-row items-start justify-end gap-10 md:gap-20">

@@ -1,6 +1,11 @@
 # AI Tools Platform
 
-A Next.js-based AI tools platform with internationalization support for English and Chinese.
+基于 Next.js 的 AI 工具平台，支持中英文国际化。
+
+## 🖼️ 项目展示
+![AI Tools Platform Demo](public/image2.png)
+
+![AI Tools Platform](public/image.png)
 
 ## ✨ 功能特性
 

@@ -22,6 +22,8 @@ export const nav = {
     "Stay updated with our latest AI tools, tips, and exclusive offers.",
   emailPlaceholder: "Enter your email",
   subscribe: "Subscribe",
+  footerDescription:
+    "AI-tools is a powerful platform offering a suite of AI-powered tools for content creation, image processing, and resume optimization. Enhance your productivity and unleash creativity with our intelligent solutions.",
 } as const;
 
 export default nav;

@@ -21,6 +21,8 @@ export const nav = {
   newsletterDescription: "获取最新的AI工具、技巧和独家优惠信息。",
   emailPlaceholder: "输入您的邮箱",
   subscribe: "订阅",
+  footerDescription:
+    "AI-tools 是一个强大的平台，提供一套AI驱动的工具，用于内容创作、图像处理和简历优化。通过我们的智能解决方案提升您的生产力并释放创造力。",
 } as const;
 
 export default nav;
