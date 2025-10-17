@@ -3,7 +3,7 @@
 import { useUser } from "@clerk/nextjs";
 import { Heart } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import toast from "react-hot-toast";
 import type { Lang } from "@/i18n";
 import { useCommunityApi } from "@/lib/useApi";
@@ -14,84 +14,33 @@ interface CommunityClientProps {
 }
 
 export default function CommunityClient({ dict }: CommunityClientProps) {
-  const [creations, setCreations] = useState<
-    Array<{
-      id: number;
-      user_id: string;
-      prompt: string;
-      content: string;
-      type: string;
-      publish: boolean;
-      likes: string[];
-      created_at: string;
-      updated_at: string;
-    }>
-  >([]);
   const { user } = useUser();
 
-  // 使用API Hook
-  const { getPublishedCreations, toggleLikeCreation } = useCommunityApi();
+  // 使用API Hook（React Query）
+  const { publishedCreationsQuery, toggleLikeMutation } = useCommunityApi();
+  const creations = publishedCreationsQuery.data?.data ?? [];
 
   useEffect(() => {
-    if (!user) return;
-
-    const fetchCreations = async () => {
-      try {
-        const result = await getPublishedCreations.execute();
-        if (result?.success && result.data) {
-          setCreations(result.data);
-        } else {
-          console.error("获取创作内容失败:", getPublishedCreations.error);
-          toast.error(dict.ai.community.fetchError);
-        }
-      } catch (error) {
-        console.error("获取创作内容时出错:", error);
-        toast.error(dict.ai.community.fetchErrorDescription);
-      }
-    };
-
-    fetchCreations();
+    if (publishedCreationsQuery.isError) {
+      toast.error(dict.ai.community.fetchErrorDescription);
+    }
   }, [
-    user,
-    getPublishedCreations.error,
-    getPublishedCreations.execute,
-    dict.ai.community.fetchError,
+    publishedCreationsQuery.isError,
     dict.ai.community.fetchErrorDescription,
   ]);
 
   const handleLike = async (creationId: number) => {
     if (!user) return;
-
+    const isLikedBefore =
+      creations.find((c) => c.id === creationId)?.likes.includes(user.id) ||
+      false;
     try {
-      const result = await toggleLikeCreation.execute(creationId);
-      if (result?.success) {
-        // 更新本地状态
-        setCreations((prevCreations) =>
-          prevCreations.map((creation) => {
-            if (creation.id === creationId) {
-              const isLiked = creation.likes.includes(user.id);
-              return {
-                ...creation,
-                likes: isLiked
-                  ? creation.likes.filter((id) => id !== user.id)
-                  : [...creation.likes, user.id],
-              };
-            }
-            return creation;
-          }),
-        );
-        const isLiked =
-          creations.find((c) => c.id === creationId)?.likes.includes(user.id) ||
-          false;
-        toast.success(
-          isLiked
-            ? dict.ai.community.unlikeSuccess
-            : dict.ai.community.likeSuccess,
-        );
-      } else {
-        console.error("点赞操作失败:", toggleLikeCreation.error);
-        toast.error(dict.ai.community.likeError);
-      }
+      await toggleLikeMutation.mutateAsync(creationId);
+      toast.success(
+        isLikedBefore
+          ? dict.ai.community.unlikeSuccess
+          : dict.ai.community.likeSuccess,
+      );
     } catch (error) {
       console.error("点赞时出错:", error);
       toast.error(dict.ai.community.likeErrorDescription);
@@ -102,7 +51,7 @@ export default function CommunityClient({ dict }: CommunityClientProps) {
     <div className="flex-1 h-full flex flex-col gap-4 p-6">
       <h1 className="text-2xl font-bold">{dict.ai.community.title}</h1>
       <div className="bg-white h-full w-full rounded-xl overflow-y-scroll">
-        {getPublishedCreations.loading ? (
+        {publishedCreationsQuery.isLoading ? (
           <div className="flex justify-center items-center h-full">
             <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>

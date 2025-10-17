@@ -30,7 +30,7 @@ export default function RemoveBackgroundClient({
     e.preventDefault();
 
     // 防止重复提交
-    if (removeBackground.loading) {
+    if (removeBackground.isPending) {
       return;
     }
 
@@ -40,7 +40,7 @@ export default function RemoveBackgroundClient({
     }
 
     try {
-      const result = await removeBackground.execute(selectedFile);
+      const result = await removeBackground.mutateAsync(selectedFile);
 
       if (result?.success && result.content) {
         setGeneratedContent(result.content);
@@ -71,7 +71,7 @@ export default function RemoveBackgroundClient({
         onInputChange={setFileName}
         selectedValue=""
         onSelect={() => {}}
-        loading={removeBackground.loading}
+        loading={removeBackground.isPending}
         onFileChange={handleFileChange}
       />
 
@@ -81,8 +81,14 @@ export default function RemoveBackgroundClient({
         placeholderText={dict.ai.aiTools.backgroundRemoval.placeholder}
         iconColor="text-[#FF6B35]"
         content={generatedContent}
-        loading={removeBackground.loading}
-        error={removeBackground.error}
+        loading={removeBackground.isPending}
+        error={
+          removeBackground.error
+            ? removeBackground.error instanceof Error
+              ? removeBackground.error.message
+              : String(removeBackground.error)
+            : null
+        }
         isImage={true}
       />
     </AiToolLayout>

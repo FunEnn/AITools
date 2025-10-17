@@ -1,4 +1,5 @@
 import { useAuth } from "@clerk/nextjs";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useState } from "react";
 import { api } from "./api";
 import { setTokenGetter } from "./request";
@@ -70,56 +71,98 @@ export function useApi<T = unknown, Args extends any[] = any[]>(
 // 用户相关Hooks
 export const useUserApi = () => {
   const { getToken } = useAuth();
+  const queryClient = useQueryClient();
 
   // 设置token获取函数
   useEffect(() => {
     setTokenGetter(getToken);
   }, [getToken]);
 
-  const getUserCreations = useApi(api.user.getUserCreations);
-  const getPublishedCreations = useApi(api.user.getPublishedCreations);
-  const toggleLikeCreation = useApi(api.user.toggleLikeCreation);
+  // Queries
+  const userCreationsQuery = useQuery({
+    queryKey: ["user", "creations"],
+    queryFn: () => api.user.getUserCreations(),
+  });
+  const publishedCreationsQuery = useQuery({
+    queryKey: ["community", "published"],
+    queryFn: () => api.user.getPublishedCreations(),
+  });
+
+  // Mutations
+  const toggleLikeMutation = useMutation({
+    mutationFn: (id: number) => api.user.toggleLikeCreation(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["community", "published"] });
+      queryClient.invalidateQueries({ queryKey: ["user", "creations"] });
+    },
+  });
 
   return {
-    getUserCreations,
-    getPublishedCreations,
-    toggleLikeCreation,
+    userCreationsQuery,
+    publishedCreationsQuery,
+    toggleLikeMutation,
   };
 };
 
 // 社区相关Hooks（优化版）
 export const useCommunityApi = () => {
   const { getToken } = useAuth();
+  const queryClient = useQueryClient();
 
   // 设置token获取函数
   useEffect(() => {
     setTokenGetter(getToken);
   }, [getToken]);
 
-  const getPublishedCreations = useApi(api.user.getPublishedCreations);
-  const toggleLikeCreation = useApi(api.user.toggleLikeCreation);
+  const publishedCreationsQuery = useQuery({
+    queryKey: ["community", "published"],
+    queryFn: () => api.user.getPublishedCreations(),
+  });
+  const toggleLikeMutation = useMutation({
+    mutationFn: (id: number) => api.user.toggleLikeCreation(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["community", "published"] });
+    },
+  });
 
   return {
-    getPublishedCreations,
-    toggleLikeCreation,
+    publishedCreationsQuery,
+    toggleLikeMutation,
   };
 };
 
 // AI工具相关Hooks
 export const useAiApi = () => {
   const { getToken } = useAuth();
+  const queryClient = useQueryClient();
 
   // 设置token获取函数
   useEffect(() => {
     setTokenGetter(getToken);
   }, [getToken]);
 
-  const generateArticle = useApi(api.ai.generateArticle);
-  const generateBlogTitle = useApi(api.ai.generateBlogTitle);
-  const generateImage = useApi(api.ai.generateImage);
-  const removeBackground = useApi(api.ai.removeBackground);
-  const removeObject = useApi(api.ai.removeObject);
-  const reviewResume = useApi(api.ai.reviewResume);
+  const generateArticle = useMutation({
+    mutationFn: api.ai.generateArticle,
+  });
+  const generateBlogTitle = useMutation({
+    mutationFn: api.ai.generateBlogTitle,
+  });
+  const generateImage = useMutation({
+    mutationFn: api.ai.generateImage,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user", "creations"] });
+      queryClient.invalidateQueries({ queryKey: ["community", "published"] });
+    },
+  });
+  const removeBackground = useMutation({
+    mutationFn: api.ai.removeBackground,
+  });
+  const removeObject = useMutation({
+    mutationFn: api.ai.removeObject,
+  });
+  const reviewResume = useMutation({
+    mutationFn: api.ai.reviewResume,
+  });
 
   return {
     generateArticle,

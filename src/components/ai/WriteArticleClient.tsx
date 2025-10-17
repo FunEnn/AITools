@@ -34,7 +34,7 @@ export default function WriteArticleClient({
     e.preventDefault();
 
     // 防止重复提交
-    if (generateArticle.loading) {
+    if (generateArticle.isPending) {
       return;
     }
 
@@ -53,7 +53,7 @@ export default function WriteArticleClient({
           .replace("{length}", length.toString()) +
         ` 请用${language}生成文章内容。`;
 
-      const result = await generateArticle.execute({
+      const result = await generateArticle.mutateAsync({
         prompt: prompt,
         length: length.toString(),
       });
@@ -91,7 +91,7 @@ export default function WriteArticleClient({
         onInputChange={setInput}
         selectedValue={selectedLength}
         onSelect={setSelectedLength}
-        loading={generateArticle.loading}
+        loading={generateArticle.isPending}
       />
 
       <AiToolResult
@@ -100,8 +100,14 @@ export default function WriteArticleClient({
         placeholderText={dict.ai.writeArticle.placeholder}
         iconColor="text-[#4A7AFF]"
         content={generatedContent}
-        loading={generateArticle.loading}
-        error={generateArticle.error}
+        loading={generateArticle.isPending}
+        error={
+          generateArticle.error
+            ? generateArticle.error instanceof Error
+              ? generateArticle.error.message
+              : String(generateArticle.error)
+            : null
+        }
         maxHeight="min-h-96 max-h-[600px]"
         renderMarkdown={true}
       />

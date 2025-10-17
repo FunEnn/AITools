@@ -28,7 +28,7 @@ export default function RemoveObjectClient({ dict }: RemoveObjectClientProps) {
     e.preventDefault();
 
     // 防止重复提交
-    if (removeObject.loading) {
+    if (removeObject.isPending) {
       return;
     }
 
@@ -43,7 +43,7 @@ export default function RemoveObjectClient({ dict }: RemoveObjectClientProps) {
     }
 
     try {
-      const result = await removeObject.execute({
+      const result = await removeObject.mutateAsync({
         image: selectedFile,
         object: input,
       });
@@ -74,7 +74,7 @@ export default function RemoveObjectClient({ dict }: RemoveObjectClientProps) {
         onInputChange={setInput}
         selectedValue=""
         onSelect={() => {}}
-        loading={removeObject.loading}
+        loading={removeObject.isPending}
         onFileChange={handleFileChange}
       />
 
@@ -84,8 +84,14 @@ export default function RemoveObjectClient({ dict }: RemoveObjectClientProps) {
         placeholderText={dict.ai.aiTools.objectRemoval.placeholder}
         iconColor="text-[#4A7AFF]"
         content={generatedContent}
-        loading={removeObject.loading}
-        error={removeObject.error}
+        loading={removeObject.isPending}
+        error={
+          removeObject.error
+            ? removeObject.error instanceof Error
+              ? removeObject.error.message
+              : String(removeObject.error)
+            : null
+        }
         isImage={true}
       />
     </AiToolLayout>

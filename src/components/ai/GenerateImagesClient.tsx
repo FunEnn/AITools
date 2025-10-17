@@ -33,7 +33,7 @@ export default function GenerateImagesClient({
     e.preventDefault();
 
     // 防止重复提交
-    if (generateImage.loading) {
+    if (generateImage.isPending) {
       return;
     }
 
@@ -45,7 +45,7 @@ export default function GenerateImagesClient({
     try {
       const prompt = `请生成一个${selectedStyle}风格的图像，描述：${input}。要求图像质量高，细节丰富。`;
 
-      const result = await generateImage.execute({
+      const result = await generateImage.mutateAsync({
         prompt: prompt,
         publish: publish,
       });
@@ -83,7 +83,7 @@ export default function GenerateImagesClient({
         onInputChange={setInput}
         selectedValue={selectedStyle}
         onSelect={setSelectedStyle}
-        loading={generateImage.loading}
+        loading={generateImage.isPending}
       >
         <div className="my-6 flex items-center gap-2">
           <label className="relative cursor-pointer">
@@ -108,8 +108,14 @@ export default function GenerateImagesClient({
         placeholderText={dict.ai.aiTools.imageGeneration.placeholder}
         iconColor="text-[#00AD25]"
         content={generatedContent}
-        loading={generateImage.loading}
-        error={generateImage.error}
+        loading={generateImage.isPending}
+        error={
+          generateImage.error
+            ? generateImage.error instanceof Error
+              ? generateImage.error.message
+              : String(generateImage.error)
+            : null
+        }
         isImage={true}
       />
     </AiToolLayout>

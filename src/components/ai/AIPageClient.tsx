@@ -2,7 +2,7 @@
 
 import { Protect } from "@clerk/nextjs";
 import { Gem, Sparkles } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import toast from "react-hot-toast";
 import CreationItem from "@/components/ui/CreationItem";
 import type { Lang } from "@/i18n";
@@ -15,40 +15,14 @@ interface AIPageClientProps {
 }
 
 export default function AIPageClient({ dict }: AIPageClientProps) {
-  const { getUserCreations } = useUserApi();
-  const [creations, setCreations] = useState<
-    Array<{
-      id: number;
-      prompt: string;
-      type: string;
-      content: string;
-      created_at: string;
-    }>
-  >([]);
+  const { userCreationsQuery } = useUserApi();
+  const creations = userCreationsQuery.data?.data ?? [];
 
   useEffect(() => {
-    const fetchUserCreations = async () => {
-      try {
-        const result = await getUserCreations.execute();
-        if (result?.success && result.data) {
-          setCreations(result.data);
-        } else {
-          console.error("获取用户创作内容失败:", getUserCreations.error);
-          toast.error(dict.ai.fetchError);
-        }
-      } catch (error) {
-        console.error("获取创作内容时出错:", error);
-        toast.error(dict.ai.fetchErrorDescription);
-      }
-    };
-
-    fetchUserCreations();
-  }, [
-    getUserCreations.error,
-    getUserCreations.execute,
-    dict.ai.fetchError,
-    dict.ai.fetchErrorDescription,
-  ]);
+    if (userCreationsQuery.isError) {
+      toast.error(dict.ai.fetchErrorDescription);
+    }
+  }, [userCreationsQuery.isError, dict.ai.fetchErrorDescription]);
 
   return (
     <div className="h-full overflow-y-scroll p-6">
@@ -57,7 +31,7 @@ export default function AIPageClient({ dict }: AIPageClientProps) {
         <div className="flex justify-between items-center w-72 p-4 px-6 bg-white rounded-xl border border-gray-200">
           <div className="text-slate-600">
             <p className="text-sm">{dict.ai.totalCreations}</p>
-            {getUserCreations.loading ? (
+            {userCreationsQuery.isLoading ? (
               <div className="h-6 w-16 bg-gray-200 rounded animate-pulse"></div>
             ) : (
               <h2 className="text-xl font-semibold">{creations.length}</h2>
@@ -87,7 +61,7 @@ export default function AIPageClient({ dict }: AIPageClientProps) {
       {/* Recent Creations */}
       <div className="space-y-3">
         <p className="mt-6 mb-4">{dict.ai.recentCreations}</p>
-        {getUserCreations.loading ? (
+        {userCreationsQuery.isLoading ? (
           <div className="space-y-4">
             {/* 骨架屏加载效果 */}
             {Array.from({ length: 3 }, (_, index) => (

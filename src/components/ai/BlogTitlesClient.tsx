@@ -33,7 +33,7 @@ export default function BlogTitlesClient({
     e.preventDefault();
 
     // 防止重复提交
-    if (generateBlogTitle.loading) {
+    if (generateBlogTitle.isPending) {
       return;
     }
 
@@ -50,9 +50,7 @@ export default function BlogTitlesClient({
           .replace("{category}", selectedCategory) +
         ` 请用${language}生成标题。`;
 
-      const result = await generateBlogTitle.execute({
-        prompt: prompt,
-      });
+      const result = await generateBlogTitle.mutateAsync({ prompt });
 
       if (result?.success && result.content) {
         setGeneratedContent(result.content);
@@ -87,7 +85,7 @@ export default function BlogTitlesClient({
         onInputChange={setInput}
         selectedValue={selectedCategory}
         onSelect={setSelectedCategory}
-        loading={generateBlogTitle.loading}
+        loading={generateBlogTitle.isPending}
       />
 
       <AiToolResult
@@ -96,8 +94,14 @@ export default function BlogTitlesClient({
         placeholderText={dict.ai.blogTitles.placeholder}
         iconColor="text-[#8E37EB]"
         content={generatedContent}
-        loading={generateBlogTitle.loading}
-        error={generateBlogTitle.error}
+        loading={generateBlogTitle.isPending}
+        error={
+          generateBlogTitle.error
+            ? generateBlogTitle.error instanceof Error
+              ? generateBlogTitle.error.message
+              : String(generateBlogTitle.error)
+            : null
+        }
         renderMarkdown={true}
       />
     </AiToolLayout>

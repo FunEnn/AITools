@@ -31,7 +31,7 @@ export default function ReviewResumeClient({
     e.preventDefault();
 
     // 防止重复提交
-    if (reviewResume.loading) {
+    if (reviewResume.isPending) {
       return;
     }
 
@@ -41,7 +41,7 @@ export default function ReviewResumeClient({
     }
 
     try {
-      const result = await reviewResume.execute({
+      const result = await reviewResume.mutateAsync({
         resume: selectedFile,
         language: lang,
       });
@@ -75,7 +75,7 @@ export default function ReviewResumeClient({
         onInputChange={setFileName}
         selectedValue=""
         onSelect={() => {}}
-        loading={reviewResume.loading}
+        loading={reviewResume.isPending}
         onFileChange={handleFileChange}
       />
 
@@ -85,8 +85,14 @@ export default function ReviewResumeClient({
         placeholderText={dict.ai.aiTools.resumeReview.placeholder}
         iconColor="text-[#00D4AA]"
         content={generatedContent}
-        loading={reviewResume.loading}
-        error={reviewResume.error}
+        loading={reviewResume.isPending}
+        error={
+          reviewResume.error
+            ? reviewResume.error instanceof Error
+              ? reviewResume.error.message
+              : String(reviewResume.error)
+            : null
+        }
         renderMarkdown={true}
       />
     </AiToolLayout>
