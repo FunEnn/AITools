@@ -11,7 +11,7 @@ import type { Lang } from "@/i18n";
 import { useAiApi } from "@/lib/useApi";
 
 interface ReviewResumeClientProps {
-  dict: any;
+  dict: Record<string, any>;
   lang: Lang;
 }
 
@@ -55,12 +55,39 @@ export default function ReviewResumeClient({
       }
     } catch (error: unknown) {
       console.error("审查简历时出错:", error);
-      toast.error(dict.ai.aiTools.resumeReview.generateError);
+
+      // 特殊处理 433 错误
+      if (
+        error &&
+        typeof error === "object" &&
+        "message" in error &&
+        typeof error.message === "string" &&
+        error.message.includes("433")
+      ) {
+        toast.error(
+          "文件上传被拒绝，可能是文件过大或格式不支持，请尝试上传较小的PDF文件",
+        );
+      } else {
+        toast.error(dict.ai.aiTools.resumeReview.generateError);
+      }
     }
   };
 
   const handleFileChange = (file: File | null) => {
     if (file) {
+      // 检查文件大小（限制为8MB，小于后端的10MB限制）
+      const maxSize = 8 * 1024 * 1024; // 8MB
+      if (file.size > maxSize) {
+        toast.error("文件大小不能超过8MB，请选择较小的PDF文件");
+        return;
+      }
+
+      // 检查文件类型
+      if (file.type !== "application/pdf") {
+        toast.error("请上传PDF格式的简历文件");
+        return;
+      }
+
       setSelectedFile(file);
       setFileName(file.name);
     }

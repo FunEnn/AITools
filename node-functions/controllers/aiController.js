@@ -6,7 +6,7 @@ import smms from "../configs/sm_ms.js";
 export const generateArticle = async (req, res) => {
   try {
     const { userId } = req.auth();
-    const { prompt, length } = req.body;
+    const { prompt, length, requestId } = req.body;
     const plan = req.plan;
     const free_usage = req.free_usage;
 
@@ -18,7 +18,26 @@ export const generateArticle = async (req, res) => {
       });
     }
 
-    // 调用 SiliconFlow API 生成文章
+    if (requestId) {
+      try {
+        const existingResult = await sql`
+          SELECT content FROM request_cache 
+          WHERE request_id = ${requestId} AND user_id = ${userId}
+        `;
+
+        if (existingResult.length > 0) {
+          console.log(`🔄 返回缓存的文章生成结果: ${requestId}`);
+          return res.json({
+            success: true,
+            content: existingResult[0].content,
+            cached: true,
+          });
+        }
+      } catch (cacheError) {
+        console.warn("检查请求缓存时出错:", cacheError);
+      }
+    }
+
     const response = await axios.post(
       "https://api.siliconflow.cn/v1/chat/completions",
       {
@@ -38,14 +57,26 @@ export const generateArticle = async (req, res) => {
           Authorization: `Bearer ${process.env.SILICONFLOW_API_KEY}`,
           "Content-Type": "application/json",
         },
-        timeout: 120000, // 2分钟超时
+        timeout: 120000,
       },
     );
 
     const content = response.data.choices[0].message.content;
 
-    // 保存到数据库
     await sql`INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, ${prompt}, ${content}, 'article')`;
+
+    if (requestId) {
+      try {
+        await sql`
+          INSERT INTO request_cache (request_id, user_id, content, created_at) 
+          VALUES (${requestId}, ${userId}, ${content}, NOW())
+          ON CONFLICT (request_id) DO NOTHING
+        `;
+        console.log(`💾 缓存文章生成结果: ${requestId}`);
+      } catch (cacheError) {
+        console.warn("缓存请求结果时出错:", cacheError);
+      }
+    }
 
     // 更新用户免费使用次数
     if (plan !== "premium") {
@@ -72,7 +103,7 @@ export const generateArticle = async (req, res) => {
 export const generateBlogTitle = async (req, res) => {
   try {
     const { userId } = req.auth();
-    const { prompt } = req.body;
+    const { prompt, requestId } = req.body;
     const plan = req.plan;
     const free_usage = req.free_usage;
 
@@ -84,7 +115,26 @@ export const generateBlogTitle = async (req, res) => {
       });
     }
 
-    // 调用 SiliconFlow API 生成博客标题
+    if (requestId) {
+      try {
+        const existingResult = await sql`
+          SELECT content FROM request_cache 
+          WHERE request_id = ${requestId} AND user_id = ${userId}
+        `;
+
+        if (existingResult.length > 0) {
+          console.log(`🔄 返回缓存的博客标题生成结果: ${requestId}`);
+          return res.json({
+            success: true,
+            content: existingResult[0].content,
+            cached: true,
+          });
+        }
+      } catch (cacheError) {
+        console.warn("检查请求缓存时出错:", cacheError);
+      }
+    }
+
     const response = await axios.post(
       "https://api.siliconflow.cn/v1/chat/completions",
       {
@@ -109,8 +159,20 @@ export const generateBlogTitle = async (req, res) => {
 
     const content = response.data.choices[0].message.content;
 
-    // 保存到数据库
     await sql`INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, ${prompt}, ${content}, 'blog-title')`;
+
+    if (requestId) {
+      try {
+        await sql`
+          INSERT INTO request_cache (request_id, user_id, content, created_at) 
+          VALUES (${requestId}, ${userId}, ${content}, NOW())
+          ON CONFLICT (request_id) DO NOTHING
+        `;
+        console.log(`💾 缓存博客标题生成结果: ${requestId}`);
+      } catch (cacheError) {
+        console.warn("缓存请求结果时出错:", cacheError);
+      }
+    }
 
     // 更新用户免费使用次数
     if (plan !== "premium") {
@@ -137,7 +199,7 @@ export const generateBlogTitle = async (req, res) => {
 export const generateImage = async (req, res) => {
   try {
     const { userId } = req.auth();
-    const { prompt, publish } = req.body;
+    const { prompt, publish, requestId } = req.body;
     const plan = req.plan;
 
     if (plan !== "premium") {
@@ -147,7 +209,26 @@ export const generateImage = async (req, res) => {
       });
     }
 
-    // 调用 SiliconFlow API 生成图像
+    if (requestId) {
+      try {
+        const existingResult = await sql`
+          SELECT content FROM request_cache 
+          WHERE request_id = ${requestId} AND user_id = ${userId}
+        `;
+
+        if (existingResult.length > 0) {
+          console.log(`🔄 返回缓存的图像生成结果: ${requestId}`);
+          return res.json({
+            success: true,
+            content: existingResult[0].content,
+            cached: true,
+          });
+        }
+      } catch (cacheError) {
+        console.warn("检查请求缓存时出错:", cacheError);
+      }
+    }
+
     const response = await axios.post(
       "https://api.siliconflow.cn/v1/images/generations",
       {
@@ -168,19 +249,29 @@ export const generateImage = async (req, res) => {
 
     const imageUrl = response.data.images[0].url;
 
-    // 下载生成的图像
     const downloadResponse = await axios.get(imageUrl, {
       responseType: "arraybuffer",
     });
     const imageBuffer = Buffer.from(downloadResponse.data);
 
-    // 使用SM.MS图床服务上传图像
     const uploadedImageUrl = await smms.uploadImage(imageBuffer, {
       filename: `ai-generated-${Date.now()}.png`,
     });
 
-    // 保存到数据库
     await sql`INSERT INTO creations (user_id, prompt, content, type, publish) VALUES (${userId}, ${prompt}, ${uploadedImageUrl}, 'image', ${publish || false})`;
+
+    if (requestId) {
+      try {
+        await sql`
+          INSERT INTO request_cache (request_id, user_id, content, created_at) 
+          VALUES (${requestId}, ${userId}, ${uploadedImageUrl}, NOW())
+          ON CONFLICT (request_id) DO NOTHING
+        `;
+        console.log(`💾 缓存图像生成结果: ${requestId}`);
+      } catch (cacheError) {
+        console.warn("缓存请求结果时出错:", cacheError);
+      }
+    }
 
     res.json({
       success: true,
@@ -210,7 +301,6 @@ export const removeImageBackground = async (req, res) => {
       });
     }
 
-    // 检查是否有上传的图像文件
     if (!req.file) {
       return res.status(400).json({
         success: false,
@@ -218,11 +308,9 @@ export const removeImageBackground = async (req, res) => {
       });
     }
 
-    // 将上传的图像转换为base64
     const imageBuffer = req.file.buffer;
     const base64Image = `data:image/${req.file.mimetype.split("/")[1]};base64,${imageBuffer.toString("base64")}`;
 
-    // 调用 SiliconFlow API 进行背景移除
     const response = await axios.post(
       "https://api.siliconflow.cn/v1/images/generations",
       {
@@ -244,18 +332,15 @@ export const removeImageBackground = async (req, res) => {
 
     const processedImageUrl = response.data.images[0].url;
 
-    // 下载处理后的图像
     const downloadResponse = await axios.get(processedImageUrl, {
       responseType: "arraybuffer",
     });
     const processedImageBuffer = Buffer.from(downloadResponse.data);
 
-    // 使用SM.MS图床服务上传处理后的图像
     const uploadedImageUrl = await smms.uploadImage(processedImageBuffer, {
       filename: `background-removed-${Date.now()}.png`,
     });
 
-    // 保存到数据库
     await sql`INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, 'background_removal', ${uploadedImageUrl}, 'image')`;
     res.json({
       success: true,
@@ -264,7 +349,6 @@ export const removeImageBackground = async (req, res) => {
   } catch (error) {
     console.error("背景移除错误:", error);
 
-    // 处理内容过滤错误
     let errorMessage = "背景移除服务暂时不可用，请稍后重试";
 
     if (
@@ -297,7 +381,6 @@ export const removeImageObject = async (req, res) => {
       });
     }
 
-    // 检查是否有上传的图像文件
     if (!req.file) {
       return res.status(400).json({
         success: false,
@@ -305,7 +388,6 @@ export const removeImageObject = async (req, res) => {
       });
     }
 
-    // 检查是否指定了要移除的对象
     if (!object) {
       return res.status(400).json({
         success: false,
@@ -313,11 +395,9 @@ export const removeImageObject = async (req, res) => {
       });
     }
 
-    // 将上传的图像转换为base64
     const imageBuffer = req.file.buffer;
     const base64Image = `data:image/${req.file.mimetype.split("/")[1]};base64,${imageBuffer.toString("base64")}`;
 
-    // 调用 SiliconFlow API 进行对象移除
     const response = await axios.post(
       "https://api.siliconflow.cn/v1/images/generations",
       {
@@ -338,18 +418,15 @@ export const removeImageObject = async (req, res) => {
 
     const processedImageUrl = response.data.images[0].url;
 
-    // 下载处理后的图像
     const downloadResponse = await axios.get(processedImageUrl, {
       responseType: "arraybuffer",
     });
     const processedImageBuffer = Buffer.from(downloadResponse.data);
 
-    // 使用SM.MS图床服务上传处理后的图像
     const uploadedImageUrl = await smms.uploadImage(processedImageBuffer, {
       filename: `object-removed-${Date.now()}.png`,
     });
 
-    // 保存到数据库
     await sql`INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, ${`object_removal_${object}`}, ${uploadedImageUrl}, 'image')`;
 
     res.json({
@@ -360,7 +437,6 @@ export const removeImageObject = async (req, res) => {
   } catch (error) {
     console.error("对象移除错误:", error);
 
-    // 处理内容过滤错误
     let errorMessage = "对象移除服务暂时不可用，请稍后重试";
 
     if (
@@ -384,7 +460,7 @@ export const resumeReview = async (req, res) => {
   try {
     const { userId } = req.auth();
     const plan = req.plan;
-    const { language = "zh" } = req.body; // 获取语言参数，默认为中文
+    const { language = "zh", requestId } = req.body;
 
     if (plan !== "premium") {
       return res.json({
@@ -393,7 +469,27 @@ export const resumeReview = async (req, res) => {
       });
     }
 
-    // 检查是否有上传的简历文件
+    if (requestId) {
+      try {
+        const existingResult = await sql`
+          SELECT content FROM request_cache 
+          WHERE request_id = ${requestId} AND user_id = ${userId}
+        `;
+
+        if (existingResult.length > 0) {
+          console.log(`🔄 返回缓存的简历审查结果: ${requestId}`);
+          return res.json({
+            success: true,
+            content: existingResult[0].content,
+            reviewType: "resume",
+            cached: true,
+          });
+        }
+      } catch (cacheError) {
+        console.warn("检查请求缓存时出错:", cacheError);
+      }
+    }
+
     if (!req.file) {
       return res.status(400).json({
         success: false,
@@ -401,14 +497,11 @@ export const resumeReview = async (req, res) => {
       });
     }
 
-    // 读取PDF文件内容
     const dataBuffer = req.file.buffer;
 
-    // 使用 pdf-parse-new 解析 PDF
     const { default: pdfParse } = await import("pdf-parse-new");
     const pdfData = await pdfParse(dataBuffer);
 
-    // 根据语言构建简历审查提示词
     const isEnglish = language === "en";
     const prompt = isEnglish
       ? `Please carefully review the following resume and provide constructive feedback, including:
@@ -438,7 +531,6 @@ ${pdfData.text}
 
 请用中文回复，并提供具体、实用的建议。`;
 
-    // 调用 SiliconFlow API 进行简历审查
     const response = await axios.post(
       "https://api.siliconflow.cn/v1/chat/completions",
       {
@@ -463,8 +555,20 @@ ${pdfData.text}
 
     const reviewContent = response.data.choices[0].message.content;
 
-    // 保存到数据库
     await sql`INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, 'resume_review', ${reviewContent}, 'resume-review')`;
+
+    if (requestId) {
+      try {
+        await sql`
+          INSERT INTO request_cache (request_id, user_id, content, created_at) 
+          VALUES (${requestId}, ${userId}, ${reviewContent}, NOW())
+          ON CONFLICT (request_id) DO NOTHING
+        `;
+        console.log(`💾 缓存简历审查结果: ${requestId}`);
+      } catch (cacheError) {
+        console.warn("缓存请求结果时出错:", cacheError);
+      }
+    }
 
     res.json({
       success: true,

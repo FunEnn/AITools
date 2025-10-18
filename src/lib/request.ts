@@ -21,6 +21,7 @@ export const setTokenGetter = (tokenGetter: () => Promise<string | null>) => {
 const RETRY_CONFIG = {
   maxRetries: 3,
   retryDelay: 1000, // 1秒
+  // 支持429（请求过于频繁）和433（请求被拒绝）错误的重试
 };
 
 // 创建axios实例
@@ -107,8 +108,8 @@ request.interceptors.response.use(
       data: error.response?.data,
     });
 
-    // 处理429错误 - 自动重试
-    if (error.response?.status === 429) {
+    // 处理429和433错误 - 自动重试
+    if (error.response?.status === 429 || error.response?.status === 433) {
       const config = error.config as { _retryCount?: number };
       if (config && !config._retryCount) {
         config._retryCount = 0;
@@ -119,7 +120,7 @@ request.interceptors.response.use(
         const delay =
           RETRY_CONFIG.retryDelay * 2 ** ((config._retryCount ?? 1) - 1);
         console.log(
-          `🔄 请求重试 ${config._retryCount}/${RETRY_CONFIG.maxRetries}，${delay}ms后重试...`,
+          `🔄 请求重试 ${config._retryCount}/${RETRY_CONFIG.maxRetries}，${delay}ms后重试... (状态码: ${error.response?.status})`,
         );
 
         await new Promise((resolve) => setTimeout(resolve, delay));
@@ -154,6 +155,9 @@ request.interceptors.response.use(
           break;
         case 429:
           console.error("❌ 请求过于频繁，请稍后重试");
+          break;
+        case 433:
+          console.error("❌ 请求被拒绝，可能是请求头过大或服务器限制");
           break;
         case 500:
           console.error("❌ 服务器内部错误");
@@ -238,6 +242,8 @@ export const http = {
       headers: {
         "Content-Type": "multipart/form-data",
       },
+      // 增加超时时间，文件上传可能需要更长时间
+      timeout: 180000, // 3分钟超时
       ...config,
     });
   },
