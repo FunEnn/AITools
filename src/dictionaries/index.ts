@@ -11,6 +11,7 @@ const translations = {
       import("./en/testimonials").then((module) => module.default),
     ai: () => import("./en/ai").then((module) => module.default),
     notFound: () => import("./en/not-found").then((module) => module.default),
+    about: () => import("./en/about").then((module) => module.default),
   },
   zh: {
     nav: () => import("./zh/nav").then((module) => module.default),
@@ -21,6 +22,7 @@ const translations = {
       import("./zh/testimonials").then((module) => module.default),
     ai: () => import("./zh/ai").then((module) => module.default),
     notFound: () => import("./zh/not-found").then((module) => module.default),
+    about: () => import("./zh/about").then((module) => module.default),
   },
 };
 
@@ -32,6 +34,7 @@ export const getDictionary = async (lang: Lang) => {
   const testimonials = await translations[lang].testimonials();
   const ai = await translations[lang].ai();
   const notFound = await translations[lang].notFound();
+  const about = await translations[lang].about();
 
   return {
     nav,
@@ -41,5 +44,6 @@ export const getDictionary = async (lang: Lang) => {
     testimonials,
     ai,
     notFound,
+    about,
   };
 };

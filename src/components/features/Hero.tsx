@@ -39,6 +39,7 @@ export default function Hero({
         </button>
         <button
           type="button"
+          onClick={() => router.push(`/${lang}/about`)}
           className="bg-white px-10 py-3 rounded-lg border border-gray-300 hover:scale-102 active:scale-95 transition cursor-pointer"
         >
           {dict.hero.learnMore}

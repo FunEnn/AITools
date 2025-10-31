@@ -234,4 +234,38 @@ export interface Dictionary {
     description: string;
     backToHome: string;
   };
+  about: {
+    title: string;
+    subtitle: string;
+    description: string;
+    mission: {
+      title: string;
+      content: string;
+    };
+    vision: {
+      title: string;
+      content: string;
+    };
+    features: {
+      title: string;
+      items: Array<{
+        title: string;
+        description: string;
+      }>;
+    };
+    technology: {
+      title: string;
+      description: string;
+      stack: string[];
+    };
+    team: {
+      title: string;
+      content: string;
+    };
+    cta: {
+      title: string;
+      description: string;
+      button: string;
+    };
+  };
 }
