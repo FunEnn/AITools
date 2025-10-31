@@ -27,7 +27,7 @@ export default function AILayoutClient({
   // 加载中状态
   if (!isLoaded) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-slate-50 to-gray-100">
+      <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-slate-50 to-gray-100 overflow-hidden">
         <div className="flex flex-col items-center space-y-4">
           {/* 旋转的加载图标 */}
           <div className="relative">
@@ -55,7 +55,7 @@ export default function AILayoutClient({
   // 未登录时显示登录页面
   if (!isSignedIn) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="fixed inset-0 flex items-center justify-center overflow-auto bg-gray-50">
         <SignIn routing="hash" />
       </div>
     );
@@ -63,12 +63,12 @@ export default function AILayoutClient({
 
   // 已登录时显示正常布局
   return (
-    <>
-      <nav className="w-full px-8 min-h-14 flex items-center justify-between border-b border-gray-200">
+    <div className="fixed inset-0 flex flex-col overflow-hidden">
+      <nav className="w-full px-8 h-14 flex items-center justify-between border-b border-gray-200 bg-white z-10 flex-shrink-0">
         <Image
           src={assets.logo}
           alt="Logo"
-          onClick={() => router.push("/")}
+          onClick={() => router.push(`/${lang}`)}
           className="cursor-pointer w-24 sm:w-32"
         />
         {sidebar ? (
@@ -84,15 +84,17 @@ export default function AILayoutClient({
         )}
       </nav>
 
-      <div className="flex-1 w-full flex h-[calc(100vh-64px)]">
+      <div className="flex-1 w-full flex overflow-hidden">
         <Sidebar
           sidebar={sidebar}
           setSidebar={setSidebar}
           dict={dict}
           lang={lang}
         />
-        <main className="flex-1 p-6 overflow-y-auto">{children}</main>
+        <main className="flex-1 p-6 overflow-y-auto bg-gray-50">
+          {children}
+        </main>
       </div>
-    </>
+    </div>
   );
 }
