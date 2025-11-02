@@ -31,7 +31,7 @@ export default function About({
         </div>
 
         <div className="space-y-8 mt-20">
-          <div className="bg-white/30 backdrop-blur-sm rounded-lg p-8 sm:p-10 shadow-lg border border-white/20 hover:bg-white/40 transition-all duration-300">
+          <div className="backdrop-blur-sm rounded-lg p-8 sm:p-10 shadow-lg border border-white/10 hover:border-white/20 transition-all duration-300">
             <h2 className="text-slate-700 text-2xl sm:text-3xl font-semibold mb-4">
               {dict.about.mission.title}
             </h2>
@@ -40,7 +40,7 @@ export default function About({
             </p>
           </div>
 
-          <div className="bg-white/30 backdrop-blur-sm rounded-lg p-8 sm:p-10 shadow-lg border border-white/20 hover:bg-white/40 transition-all duration-300">
+          <div className="backdrop-blur-sm rounded-lg p-8 sm:p-10 shadow-lg border border-white/10 hover:border-white/20 transition-all duration-300">
             <h2 className="text-slate-700 text-2xl sm:text-3xl font-semibold mb-4">
               {dict.about.vision.title}
             </h2>
@@ -49,7 +49,7 @@ export default function About({
             </p>
           </div>
 
-          <div className="bg-white/30 backdrop-blur-sm rounded-lg p-8 sm:p-10 shadow-lg border border-white/20">
+          <div className="backdrop-blur-sm rounded-lg p-8 sm:p-10 shadow-lg border border-white/10">
             <h2 className="text-slate-700 text-2xl sm:text-3xl font-semibold mb-8">
               {dict.about.features.title}
             </h2>
@@ -57,7 +57,7 @@ export default function About({
               {dict.about.features.items.map((feature) => (
                 <div
                   key={feature.title}
-                  className="p-6 bg-white/20 backdrop-blur-sm rounded-lg border border-white/20 hover:-translate-y-1 hover:bg-white/30 hover:shadow-md transition-all duration-300 cursor-pointer"
+                  className="p-6 backdrop-blur-sm rounded-lg border border-white/10 hover:-translate-y-1 hover:border-white/20 hover:shadow-md transition-all duration-300 cursor-pointer"
                 >
                   <h3 className="text-xl font-semibold text-slate-700 mb-3">
                     {feature.title}
@@ -70,7 +70,7 @@ export default function About({
             </div>
           </div>
 
-          <div className="bg-white/30 backdrop-blur-sm rounded-lg p-8 sm:p-10 shadow-lg border border-white/20">
+          <div className="backdrop-blur-sm rounded-lg p-8 sm:p-10 shadow-lg border border-white/10">
             <h2 className="text-slate-700 text-2xl sm:text-3xl font-semibold mb-4">
               {dict.about.technology.title}
             </h2>
@@ -89,7 +89,7 @@ export default function About({
             </div>
           </div>
 
-          <div className="bg-white/30 backdrop-blur-sm rounded-lg p-8 sm:p-10 shadow-lg border border-white/20 hover:bg-white/40 transition-all duration-300">
+          <div className="backdrop-blur-sm rounded-lg p-8 sm:p-10 shadow-lg border border-white/10 hover:border-white/20 transition-all duration-300">
             <h2 className="text-slate-700 text-2xl sm:text-3xl font-semibold mb-4">
               {dict.about.team.title}
             </h2>

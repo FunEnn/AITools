@@ -17,11 +17,16 @@ export const nav = {
   quickLinks: "Quick Links",
   aboutUs: "About Us",
   privacyPolicy: "Privacy Policy",
-  newsletter: "Newsletter",
-  newsletterDescription:
-    "Stay updated with our latest AI tools, tips, and exclusive offers.",
-  emailPlaceholder: "Enter your email",
-  subscribe: "Subscribe",
+  contactUs: "Contact Us",
+  contactDescription: "Get in touch with us through our social media or email.",
+  email: "3095852337@qq.com",
+  socialLinks: [
+    {
+      name: "GitHub",
+      url: "https://github.com/FunEnn/AITools",
+      icon: "github",
+    },
+  ],
   footerDescription:
     "AI-tools is a powerful platform offering a suite of AI-powered tools for content creation, image processing, and resume optimization. Enhance your productivity and unleash creativity with our intelligent solutions.",
 } as const;

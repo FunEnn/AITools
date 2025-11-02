@@ -17,10 +17,16 @@ export const nav = {
   quickLinks: "快速链接",
   aboutUs: "关于我们",
   privacyPolicy: "隐私政策",
-  newsletter: "邮件订阅",
-  newsletterDescription: "获取最新的AI工具、技巧和独家优惠信息。",
-  emailPlaceholder: "输入您的邮箱",
-  subscribe: "订阅",
+  contactUs: "联系我们",
+  contactDescription: "通过社交媒体或邮箱与我们取得联系。",
+  email: "3095852337@qq.com",
+  socialLinks: [
+    {
+      name: "GitHub",
+      url: "https://github.com/FunEnn/AITools",
+      icon: "github",
+    },
+  ],
   footerDescription:
     "AI-tools 是一个强大的平台，提供一套AI驱动的工具，用于内容创作、图像处理和简历优化。通过我们的智能解决方案提升您的生产力并释放创造力。",
 } as const;

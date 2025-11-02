@@ -16,6 +16,18 @@ export interface Dictionary {
     removeObject: string;
     reviewResume: string;
     plan: string;
+    quickLinks: string;
+    aboutUs: string;
+    privacyPolicy: string;
+    contactUs: string;
+    contactDescription: string;
+    email: string;
+    socialLinks: Array<{
+      name: string;
+      url: string;
+      icon: string;
+    }>;
+    footerDescription: string;
   };
   hero: {
     title: string;
@@ -266,6 +278,42 @@ export interface Dictionary {
       title: string;
       description: string;
       button: string;
+    };
+  };
+  privacy: {
+    title: string;
+    subtitle: string;
+    lastUpdated: string;
+    introduction: {
+      title: string;
+      content: string;
+    };
+    dataCollection: {
+      title: string;
+      items: Array<{
+        title: string;
+        description: string;
+      }>;
+    };
+    dataUse: {
+      title: string;
+      items: Array<{
+        title: string;
+        description: string;
+      }>;
+    };
+    dataSharing: {
+      title: string;
+      content: string;
+      items: Array<{
+        title: string;
+        description: string;
+      }>;
+    };
+    contact: {
+      title: string;
+      content: string;
+      email: string;
     };
   };
 }

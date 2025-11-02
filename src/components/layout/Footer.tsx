@@ -1,10 +1,26 @@
 "use client";
 
+import { Github, Mail } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { assets } from "@/assets/assets";
+import type { Dictionary } from "@/types/dictionary";
 
-export default function Footer({ dict, lang }: { dict: any; lang: string }) {
+const socialIcons: Record<
+  string,
+  React.ComponentType<{ className?: string }>
+> = {
+  github: Github,
+  mail: Mail,
+};
+
+export default function Footer({
+  dict,
+  lang,
+}: {
+  dict: Dictionary;
+  lang: string;
+}) {
   const router = useRouter();
   const year = new Date().getFullYear();
   return (
@@ -65,21 +81,35 @@ export default function Footer({ dict, lang }: { dict: any; lang: string }) {
             </ul>
           </div>
           <div className="w-full sm:w-auto sm:min-w-[280px]">
-            <h2 className="font-semibold mb-5">{dict.nav.newsletter}</h2>
-            <div className="text-sm space-y-2">
-              <p className="opacity-60">{dict.nav.newsletterDescription}</p>
-              <div className="flex items-center gap-2 pt-4">
-                <input
-                  className="bg-transparent border border-gray-500/20 placeholder-gray-500 focus:ring-2 ring-[--color-primary] outline-none w-full h-10 rounded-lg px-3"
-                  type="email"
-                  placeholder={dict.nav.emailPlaceholder}
-                />
-                <button
-                  type="button"
-                  className="bg-[--color-primary] hover:opacity-90 transition-opacity min-w-24 h-10 text-white rounded-lg cursor-pointer"
+            <h2 className="font-semibold mb-5">{dict.nav.contactUs}</h2>
+            <div className="text-sm space-y-3">
+              <p className="opacity-60">{dict.nav.contactDescription}</p>
+              <div className="flex items-center gap-4 pt-2">
+                {dict.nav.socialLinks.map((link, index) => {
+                  const IconComponent =
+                    socialIcons[link.icon] || socialIcons.github;
+                  return (
+                    <a //github.com/FunEnn/AITools
+                      key={link.url}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="opacity-60 hover:opacity-100 transition-opacity"
+                      aria-label={link.name}
+                    >
+                      <IconComponent className="w-5 h-5" />
+                    </a>
+                  );
+                })}
+              </div>
+              <div className="pt-2">
+                <a
+                  href={`mailto:${dict.nav.email}`}
+                  className="opacity-60 hover:opacity-100 transition-opacity flex items-center gap-2"
                 >
-                  {dict.nav.subscribe}
-                </button>
+                  <Mail className="w-4 h-4" />
+                  {dict.nav.email}
+                </a>
               </div>
             </div>
           </div>

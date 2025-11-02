@@ -12,6 +12,7 @@ const translations = {
     ai: () => import("./en/ai").then((module) => module.default),
     notFound: () => import("./en/not-found").then((module) => module.default),
     about: () => import("./en/about").then((module) => module.default),
+    privacy: () => import("./en/privacy").then((module) => module.default),
   },
   zh: {
     nav: () => import("./zh/nav").then((module) => module.default),
@@ -23,6 +24,7 @@ const translations = {
     ai: () => import("./zh/ai").then((module) => module.default),
     notFound: () => import("./zh/not-found").then((module) => module.default),
     about: () => import("./zh/about").then((module) => module.default),
+    privacy: () => import("./zh/privacy").then((module) => module.default),
   },
 };
 
@@ -35,6 +37,7 @@ export const getDictionary = async (lang: Lang) => {
   const ai = await translations[lang].ai();
   const notFound = await translations[lang].notFound();
   const about = await translations[lang].about();
+  const privacy = await translations[lang].privacy();
 
   return {
     nav,
@@ -45,5 +48,6 @@ export const getDictionary = async (lang: Lang) => {
     ai,
     notFound,
     about,
+    privacy,
   };
 };
