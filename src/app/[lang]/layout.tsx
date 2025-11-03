@@ -3,6 +3,7 @@
 import { enUS, zhCN } from "@clerk/localizations";
 import { ClerkProvider } from "@clerk/nextjs";
 import { use } from "react";
+import ScrollToTop from "@/components/layout/ScrollToTop";
 
 export default function LocaleLayout({
   children,
@@ -15,6 +16,7 @@ export default function LocaleLayout({
 
   return (
     <ClerkProvider localization={lang === "zh" ? zhCN : enUS}>
+      <ScrollToTop />
       {children}
     </ClerkProvider>
   );

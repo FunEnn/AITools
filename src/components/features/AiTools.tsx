@@ -2,6 +2,7 @@
 
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { getAiToolsData } from "@/assets/assets";
 import type { Lang } from "@/i18n";
 import type { Dictionary } from "@/types/dictionary";
@@ -15,6 +16,43 @@ export default function AiTools({
 }) {
   const router = useRouter();
   const { isSignedIn } = useUser();
+  const [visibleCards, setVisibleCards] = useState<Set<number>>(new Set());
+  const cardRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  useEffect(() => {
+    const observers: IntersectionObserver[] = [];
+
+    cardRefs.current.forEach((card, index) => {
+      if (card) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                // 使用 requestAnimationFrame 确保在下一帧触发，避免闪烁
+                requestAnimationFrame(() => {
+                  setVisibleCards((prev) => new Set([...prev, index]));
+                });
+                observer.unobserve(card);
+              }
+            });
+          },
+          {
+            threshold: 0.05,
+            rootMargin: "50px 0px 0px 0px",
+          },
+        );
+
+        observer.observe(card);
+        observers.push(observer);
+      }
+    });
+
+    return () => {
+      for (const observer of observers) {
+        observer.disconnect();
+      }
+    };
+  }, []);
 
   return (
     <div className="px-4 sm:px-20 xl:px-32 my-24">
@@ -28,11 +66,24 @@ export default function AiTools({
       </div>
 
       <div className="flex flex-wrap mt-10 justify-center">
-        {getAiToolsData(dict, lang).map((tool) => (
+        {getAiToolsData(dict, lang).map((tool, index) => (
           <button
             key={tool.path}
+            ref={(el) => {
+              cardRefs.current[index] = el;
+            }}
             type="button"
-            className="p-8 m-4 max-w-xs text-left rounded-lg bg-[#FDFDFE] shadow-lg border border-gray-100 hover:-translate-y-1 transition-all duration-300 cursor-pointer"
+            className={`p-8 m-4 max-w-xs text-left rounded-lg bg-[#FDFDFE] shadow-lg border border-gray-100 hover:-translate-y-2 hover:shadow-xl transition-all duration-500 cursor-pointer ${
+              visibleCards.has(index) ? "opacity-100" : "opacity-0"
+            }`}
+            style={{
+              transform: visibleCards.has(index)
+                ? "translateY(0)"
+                : "translateY(30px)",
+              transition: visibleCards.has(index)
+                ? `opacity 0.6s ease-out ${index * 0.1}s, transform 0.6s ease-out ${index * 0.1}s`
+                : "opacity 0s, transform 0s",
+            }}
             onClick={() => isSignedIn && router.push(tool.path)}
           >
             <tool.Icon
