@@ -18,31 +18,8 @@ export default function Hero({
   const heroRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // 页面加载时立即显示（Hero区域在顶部）
+    // Hero区域在页面顶部，加载时立即显示
     setIsVisible(true);
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsVisible(true);
-          }
-        });
-      },
-      {
-        threshold: 0.1,
-      },
-    );
-
-    if (heroRef.current) {
-      observer.observe(heroRef.current);
-    }
-
-    return () => {
-      if (heroRef.current) {
-        observer.unobserve(heroRef.current);
-      }
-    };
   }, []);
 
   return (

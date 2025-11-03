@@ -3,6 +3,7 @@
 import { Github, Mail } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 import { assets } from "@/assets/assets";
 import type { Dictionary } from "@/types/dictionary";
 
@@ -22,7 +23,7 @@ export default function Footer({
   lang: string;
 }) {
   const router = useRouter();
-  const year = new Date().getFullYear();
+  const year = useMemo(() => new Date().getFullYear(), []);
   return (
     <footer className="px-6 md:px-16 lg:px-24 xl:px-32 pt-8 w-full mt-20 border-t border-gray-500/10">
       <div className="flex flex-col md:flex-row justify-between w-full gap-10 border-b border-gray-500/10 pb-8">

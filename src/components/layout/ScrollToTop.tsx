@@ -21,21 +21,14 @@ export default function ScrollToTop() {
     if (previousPathname.current !== pathname) {
       window.scrollTo(0, 0);
       previousPathname.current = pathname;
-    }
-  }, [pathname]);
-
-  useEffect(() => {
-    if (previousPathname.current !== pathname) {
       // 延迟执行，确保在浏览器可能的滚动恢复之后
-      const timer = setTimeout(() => {
+      setTimeout(() => {
         window.scrollTo({
           top: 0,
           left: 0,
           behavior: "instant",
         });
       }, 0);
-      previousPathname.current = pathname;
-      return () => clearTimeout(timer);
     }
   }, [pathname]);
 
