@@ -33,10 +33,19 @@ export const useUserApi = () => {
     },
   });
 
+  const deleteCreationMutation = useMutation({
+    mutationFn: (id: number) => api.user.deleteCreation(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user", "creations"] });
+      queryClient.invalidateQueries({ queryKey: ["community", "published"] });
+    },
+  });
+
   return {
     userCreationsQuery,
     publishedCreationsQuery,
     toggleLikeMutation,
+    deleteCreationMutation,
   };
 };
 

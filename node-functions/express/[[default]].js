@@ -12,6 +12,7 @@ import {
   resumeReview,
 } from "../controllers/aiController.js";
 import {
+  deleteCreation,
   getPublishedCreations,
   getUserCreations,
   toggleLikeCreation,
@@ -58,6 +59,7 @@ app.post("/api/ai/resume-review", auth, upload.single("resume"), resumeReview);
 app.get("/api/user/get-user-creations", auth, getUserCreations);
 app.get("/api/user/get-published-creations", auth, getPublishedCreations);
 app.post("/api/user/toggle-like-creation/:id", auth, toggleLikeCreation);
+app.delete("/api/user/delete-creation/:id", auth, deleteCreation);
 
 // 导出 express 实例
 export default app;

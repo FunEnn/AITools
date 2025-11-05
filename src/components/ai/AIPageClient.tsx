@@ -15,8 +15,35 @@ interface AIPageClientProps {
 }
 
 export default function AIPageClient({ dict }: AIPageClientProps) {
-  const { userCreationsQuery } = useUserApi();
+  const { userCreationsQuery, deleteCreationMutation } = useUserApi();
   const creations = userCreationsQuery.data?.data ?? [];
+
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteCreationMutation.mutateAsync(id);
+      toast.success(dict.ai.deleteSuccess);
+    } catch (error: unknown) {
+      console.error("删除创作失败:", error);
+      // 根据错误类型显示不同的错误消息
+      if (
+        error &&
+        typeof error === "object" &&
+        "status" in error &&
+        error.status === 404
+      ) {
+        toast.error(dict.ai.creationNotFound || dict.ai.deleteError);
+      } else if (
+        error &&
+        typeof error === "object" &&
+        "status" in error &&
+        error.status === 403
+      ) {
+        toast.error(dict.ai.forbiddenDelete || dict.ai.deleteError);
+      } else {
+        toast.error(dict.ai.deleteError);
+      }
+    }
+  };
 
   useEffect(() => {
     if (userCreationsQuery.isError) {
@@ -98,7 +125,14 @@ export default function AIPageClient({ dict }: AIPageClientProps) {
                 key={item.id}
                 className="transform transition-all duration-300 hover:scale-[1.02]"
               >
-                <CreationItem item={item} />
+                <CreationItem
+                  item={item}
+                  onDelete={handleDelete}
+                  deleteText={dict.ai.deleteCreation}
+                  deleteConfirmText={dict.ai.deleteCreationConfirm}
+                  confirmText={dict.ai.confirm}
+                  cancelText={dict.ai.cancel}
+                />
               </div>
             ))}
           </div>

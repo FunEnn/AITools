@@ -55,3 +55,34 @@ export const toggleLikeCreation = async (req, res) => {
     res.status(500).json({ success: false, message: "点赞操作失败" });
   }
 };
+
+export const deleteCreation = async (req, res) => {
+  try {
+    const { userId } = req.auth();
+    const { id } = req.params;
+
+    // 检查创作是否存在
+    const [creation] = await sql`SELECT * FROM creations WHERE id = ${id}`;
+
+    if (!creation) {
+      return res
+        .status(404)
+        .json({ success: false, message: "创作内容未找到" });
+    }
+
+    // 检查是否是创作者本人
+    if (creation.user_id !== userId) {
+      return res
+        .status(403)
+        .json({ success: false, message: "无权删除此创作" });
+    }
+
+    // 删除创作
+    await sql`DELETE FROM creations WHERE id = ${id} AND user_id = ${userId}`;
+
+    res.json({ success: true, message: "创作删除成功" });
+  } catch (error) {
+    console.error("删除创作失败:", error);
+    res.status(500).json({ success: false, message: "删除创作失败" });
+  }
+};

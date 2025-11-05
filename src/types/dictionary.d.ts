@@ -106,6 +106,14 @@ export interface Dictionary {
     generatedImageAlt: string;
     fetchError: string;
     fetchErrorDescription: string;
+    deleteCreation: string;
+    deleteCreationConfirm: string;
+    deleteSuccess: string;
+    deleteError: string;
+    creationNotFound: string;
+    forbiddenDelete: string;
+    confirm: string;
+    cancel: string;
     writeArticle: {
       title: string;
       placeholder: string;

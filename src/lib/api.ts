@@ -75,6 +75,11 @@ export const userApi = {
   toggleLikeCreation: (id: number): Promise<LikeResponse> => {
     return http.post(`/user/toggle-like-creation/${id}`);
   },
+
+  // 删除创作
+  deleteCreation: (id: number): Promise<ApiResponse> => {
+    return http.delete(`/user/delete-creation/${id}`);
+  },
 };
 
 // 生成唯一请求ID的工具函数

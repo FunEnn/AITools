@@ -16,6 +16,15 @@ export const ai = {
   fetchError: "Failed to fetch creations, please try again",
   fetchErrorDescription:
     "Error occurred while fetching creations, please try again",
+  deleteCreation: "Delete Creation",
+  deleteCreationConfirm:
+    "Are you sure you want to delete this creation? This action cannot be undone.",
+  deleteSuccess: "Creation deleted successfully",
+  deleteError: "Failed to delete creation, please try again",
+  creationNotFound: "Creation not found",
+  forbiddenDelete: "You don't have permission to delete this creation",
+  confirm: "Confirm",
+  cancel: "Cancel",
   writeArticle: {
     title: "Generated Article",
     placeholder: 'Enter a topic and click "Generate Article" to start',
