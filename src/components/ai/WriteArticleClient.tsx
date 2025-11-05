@@ -92,6 +92,7 @@ export default function WriteArticleClient({
         selectedValue={selectedLength}
         onSelect={setSelectedLength}
         loading={generateArticle.isPending}
+        processingText={dict.ai.processing}
       />
 
       <AiToolResult
@@ -110,6 +111,8 @@ export default function WriteArticleClient({
         }
         maxHeight="min-h-96 max-h-[600px]"
         renderMarkdown={true}
+        processingText={dict.ai.processing}
+        processingFailedText={dict.ai.processingFailed}
       />
     </AiToolLayout>
   );

@@ -36,6 +36,7 @@ interface AiToolFormProps<T = string | number | Option> {
   loading?: boolean;
   onFileChange?: (file: File | null) => void;
   acceptFileTypes?: string;
+  processingText?: string;
 }
 
 export default function AiToolForm<T = string | number | Option>({
@@ -49,6 +50,7 @@ export default function AiToolForm<T = string | number | Option>({
   loading = false,
   onFileChange,
   acceptFileTypes = "image/*",
+  processingText = "处理中...",
 }: AiToolFormProps<T>) {
   const {
     icon: Icon,
@@ -167,7 +169,7 @@ export default function AiToolForm<T = string | number | Option>({
         ) : (
           <ButtonIcon className="w-5" />
         )}
-        {loading ? "处理中..." : buttonText}
+        {loading ? processingText : buttonText}
       </button>
     </form>
   );

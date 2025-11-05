@@ -8,6 +8,11 @@ export const ai = {
     "Start using AI tools to create your first masterpiece!",
   loading: "Loading",
   loadingDescription: "Please wait...",
+  processing: "Processing...",
+  processingFailed: "Processing failed",
+  imageGenerated: "Image generated successfully",
+  viewInNewWindow: "View in new window",
+  generatedImageAlt: "Generated image",
   fetchError: "Failed to fetch creations, please try again",
   fetchErrorDescription:
     "Error occurred while fetching creations, please try again",

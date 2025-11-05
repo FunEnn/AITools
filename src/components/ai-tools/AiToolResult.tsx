@@ -15,6 +15,11 @@ interface AiToolResultProps {
   error?: string | null;
   renderMarkdown?: boolean;
   isImage?: boolean;
+  processingText?: string;
+  processingFailedText?: string;
+  imageGeneratedText?: string;
+  viewInNewWindowText?: string;
+  generatedImageAltText?: string;
 }
 
 export default function AiToolResult({
@@ -28,6 +33,11 @@ export default function AiToolResult({
   error,
   renderMarkdown = false,
   isImage = false,
+  processingText = "正在处理中...",
+  processingFailedText = "处理失败",
+  imageGeneratedText = "图片已生成完成",
+  viewInNewWindowText = "在新窗口中查看",
+  generatedImageAltText = "生成的图像",
 }: AiToolResultProps) {
   return (
     <div
@@ -42,14 +52,16 @@ export default function AiToolResult({
         <div className="flex-1 flex justify-center items-center">
           <div className="text-sm flex flex-col items-center gap-5 text-gray-400">
             <div className="animate-spin rounded-full h-9 w-9 border-b-2 border-[#4A7AFF]"></div>
-            <p>正在处理中...</p>
+            <p>{processingText}</p>
           </div>
         </div>
       ) : error ? (
         <div className="flex-1 flex justify-center items-center">
           <div className="text-sm flex flex-col items-center gap-5 text-red-500">
             <Icon className="w-9 h-9" />
-            <p>处理失败: {error}</p>
+            <p>
+              {processingFailedText}: {error}
+            </p>
           </div>
         </div>
       ) : content ? (
@@ -58,7 +70,7 @@ export default function AiToolResult({
             <div className="flex flex-col items-center gap-4">
               <Image
                 src={content}
-                alt="生成的图像"
+                alt={generatedImageAltText}
                 width={600}
                 height={400}
                 className="max-w-full h-auto rounded-lg shadow-lg"
@@ -68,14 +80,16 @@ export default function AiToolResult({
                 }}
               />
               <div className="text-center">
-                <p className="text-sm text-gray-600 mb-2">图片已生成完成</p>
+                <p className="text-sm text-gray-600 mb-2">
+                  {imageGeneratedText}
+                </p>
                 <a
                   href={content}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-500 hover:text-blue-700 text-sm underline"
                 >
-                  在新窗口中查看
+                  {viewInNewWindowText}
                 </a>
               </div>
             </div>

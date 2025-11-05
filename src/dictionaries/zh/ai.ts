@@ -7,6 +7,11 @@ export const ai = {
   noCreationsDescription: "开始使用 AI 工具创建您的第一个作品吧！",
   loading: "正在加载",
   loadingDescription: "请稍候...",
+  processing: "处理中...",
+  processingFailed: "处理失败",
+  imageGenerated: "图片已生成完成",
+  viewInNewWindow: "在新窗口中查看",
+  generatedImageAlt: "生成的图像",
   fetchError: "获取创作内容失败，请重试",
   fetchErrorDescription: "获取创作内容时出错，请重试",
   writeArticle: {

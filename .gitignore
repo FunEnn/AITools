@@ -45,4 +45,7 @@ next-env.d.ts
 .edgeone/*
 !.edgeone/project.json
 .tef_dist/*
-  
+
+# dist folders
+dist/
+**/dist/

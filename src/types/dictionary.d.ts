@@ -99,6 +99,11 @@ export interface Dictionary {
     noCreationsDescription: string;
     loading: string;
     loadingDescription: string;
+    processing: string;
+    processingFailed: string;
+    imageGenerated: string;
+    viewInNewWindow: string;
+    generatedImageAlt: string;
     fetchError: string;
     fetchErrorDescription: string;
     writeArticle: {

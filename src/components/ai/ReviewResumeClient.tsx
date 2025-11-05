@@ -104,6 +104,7 @@ export default function ReviewResumeClient({
         onSelect={() => {}}
         loading={reviewResume.isPending}
         onFileChange={handleFileChange}
+        processingText={dict.ai.processing}
       />
 
       <AiToolResult
@@ -121,6 +122,8 @@ export default function ReviewResumeClient({
             : null
         }
         renderMarkdown={true}
+        processingText={dict.ai.processing}
+        processingFailedText={dict.ai.processingFailed}
       />
     </AiToolLayout>
   );

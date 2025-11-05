@@ -84,6 +84,7 @@ export default function GenerateImagesClient({
         selectedValue={selectedStyle}
         onSelect={setSelectedStyle}
         loading={generateImage.isPending}
+        processingText={dict.ai.processing}
       >
         <div className="my-6 flex items-center gap-2">
           <label className="relative cursor-pointer">
@@ -117,6 +118,11 @@ export default function GenerateImagesClient({
             : null
         }
         isImage={true}
+        processingText={dict.ai.processing}
+        processingFailedText={dict.ai.processingFailed}
+        imageGeneratedText={dict.ai.imageGenerated}
+        viewInNewWindowText={dict.ai.viewInNewWindow}
+        generatedImageAltText={dict.ai.generatedImageAlt}
       />
     </AiToolLayout>
   );

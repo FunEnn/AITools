@@ -86,6 +86,7 @@ export default function BlogTitlesClient({
         selectedValue={selectedCategory}
         onSelect={setSelectedCategory}
         loading={generateBlogTitle.isPending}
+        processingText={dict.ai.processing}
       />
 
       <AiToolResult
@@ -103,6 +104,8 @@ export default function BlogTitlesClient({
             : null
         }
         renderMarkdown={true}
+        processingText={dict.ai.processing}
+        processingFailedText={dict.ai.processingFailed}
       />
     </AiToolLayout>
   );

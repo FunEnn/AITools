@@ -76,6 +76,7 @@ export default function RemoveObjectClient({ dict }: RemoveObjectClientProps) {
         onSelect={() => {}}
         loading={removeObject.isPending}
         onFileChange={handleFileChange}
+        processingText={dict.ai.processing}
       />
 
       <AiToolResult
@@ -93,6 +94,11 @@ export default function RemoveObjectClient({ dict }: RemoveObjectClientProps) {
             : null
         }
         isImage={true}
+        processingText={dict.ai.processing}
+        processingFailedText={dict.ai.processingFailed}
+        imageGeneratedText={dict.ai.imageGenerated}
+        viewInNewWindowText={dict.ai.viewInNewWindow}
+        generatedImageAltText={dict.ai.generatedImageAlt}
       />
     </AiToolLayout>
   );

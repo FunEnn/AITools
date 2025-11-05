@@ -73,6 +73,7 @@ export default function RemoveBackgroundClient({
         onSelect={() => {}}
         loading={removeBackground.isPending}
         onFileChange={handleFileChange}
+        processingText={dict.ai.processing}
       />
 
       <AiToolResult
@@ -90,6 +91,11 @@ export default function RemoveBackgroundClient({
             : null
         }
         isImage={true}
+        processingText={dict.ai.processing}
+        processingFailedText={dict.ai.processingFailed}
+        imageGeneratedText={dict.ai.imageGenerated}
+        viewInNewWindowText={dict.ai.viewInNewWindow}
+        generatedImageAltText={dict.ai.generatedImageAlt}
       />
     </AiToolLayout>
   );
