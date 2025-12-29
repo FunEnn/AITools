@@ -15,27 +15,12 @@ EdgeOne Node Functions 后端代码。
 
 ## 环境变量
 
-确保设置以下环境变量：
+环境变量统一在项目根目录的 `README.md` 中维护，请以根目录文档为准。
 
-- `DATABASE_URL` - 数据库连接字符串
-- `DIFY_API_KEY` - Dify API Key
-- `DIFY_BASE_URL` - Dify Base URL
-- `CLOUDINARY_CLOUD_NAME` - Cloudinary cloud name
-- `CLOUDINARY_API_KEY` - Cloudinary API key
-- `CLOUDINARY_API_SECRET` - Cloudinary API secret
-- `CLERK_SECRET_KEY` - Clerk 认证密钥
+## 本地联调
 
-## 部署说明
+Node Functions 会在 EdgeOne Pages 本地开发模式下运行：
 
-1. 确保所有依赖项已安装在 `package.json` 中
-2. 设置必要的环境变量
-3. 将代码推送到 Git 仓库
-4. EdgeOne Pages 将自动构建和部署 Node Functions
-
-## 注意事项
-
-- 所有 Express 路由都集中在 `[[default]].js` 文件中
-- 文件上传使用内存存储，适合 EdgeOne 环境
-- 认证使用 Clerk 中间件
-- 数据库使用 Neon PostgreSQL
-- 图像处理使用 Cloudinary
+```bash
+edgeone pages dev
+```
