@@ -15,7 +15,7 @@ export default async function PrivacyPage({ params }: PrivacyPageProps) {
   return (
     <>
       <Navbar lang={lang as Lang} dict={dict} />
-      <Privacy dict={dict} lang={lang as Lang} />
+      <Privacy dict={dict} />
       <Footer dict={dict} lang={lang} />
     </>
   );

@@ -10,5 +10,5 @@ export default async function CommunityPage({ params }: CommunityPageProps) {
   const { lang } = await params;
   const dict = await getDictionary(lang as Lang);
 
-  return <CommunityClient dict={dict} lang={lang as Lang} />;
+  return <CommunityClient dict={dict} />;
 }

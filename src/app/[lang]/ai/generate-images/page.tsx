@@ -12,5 +12,5 @@ export default async function GenerateImagesPage({
   const { lang } = await params;
   const dict = await getDictionary(lang as Lang);
 
-  return <GenerateImagesClient dict={dict} lang={lang as Lang} />;
+  return <GenerateImagesClient dict={dict} />;
 }

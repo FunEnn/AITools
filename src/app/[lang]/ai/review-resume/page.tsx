@@ -12,5 +12,5 @@ export default async function ReviewResumePage({
   const { lang } = await params;
   const dict = await getDictionary(lang as Lang);
 
-  return <ReviewResumeClient dict={dict} lang={lang as Lang} />;
+  return <ReviewResumeClient dict={dict} />;
 }

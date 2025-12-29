@@ -12,5 +12,5 @@ export default async function WriteArticlePage({
   const { lang } = await params;
   const dict = await getDictionary(lang as Lang);
 
-  return <WriteArticleClient dict={dict} lang={lang as Lang} />;
+  return <WriteArticleClient dict={dict} />;
 }

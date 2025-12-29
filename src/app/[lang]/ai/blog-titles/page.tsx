@@ -10,5 +10,5 @@ export default async function BlogTitlesPage({ params }: BlogTitlesPageProps) {
   const { lang } = await params;
   const dict = await getDictionary(lang as Lang);
 
-  return <BlogTitlesClient dict={dict} lang={lang as Lang} />;
+  return <BlogTitlesClient dict={dict} />;
 }
