@@ -7,18 +7,13 @@ import AiToolForm from "@/components/ai-tools/AiToolForm";
 import AiToolLayout from "@/components/ai-tools/AiToolLayout";
 import AiToolResult from "@/components/ai-tools/AiToolResult";
 import { getArticleFormConfig } from "@/components/ai-tools/formConfigs";
-import type { Lang } from "@/i18n";
 import { useAiApi } from "@/lib/useApi";
 
 interface WriteArticleClientProps {
   dict: any;
-  lang: Lang;
 }
 
-export default function WriteArticleClient({
-  dict,
-  lang,
-}: WriteArticleClientProps) {
+export default function WriteArticleClient({ dict }: WriteArticleClientProps) {
   const articleFormConfig = getArticleFormConfig(dict);
   const [selectedLength, setSelectedLength] = useState(
     articleFormConfig.options[0],
@@ -46,16 +41,12 @@ export default function WriteArticleClient({
     try {
       // 构建prompt模板字符串
       const length = selectedLength.valueOf();
-      const language = lang === "zh" ? "中文" : "English";
-      const prompt =
-        dict.ai.writeArticle.promptTemplate
-          .replace("{topic}", input)
-          .replace("{length}", length.toString()) +
-        ` 请用${language}生成文章内容。`;
+      const prompt = dict.ai.writeArticle.promptTemplate
+        .replace("{topic}", input)
+        .replace("{length}", length.toString());
 
       const result = await generateArticle.mutateAsync({
         prompt: prompt,
-        length: length.toString(),
       });
 
       if (result?.success && result.content) {

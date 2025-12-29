@@ -24,7 +24,7 @@
 - **数据管理** - 个人创作内容存储和管理，支持公开/私有设置
 - **智能缓存** - 基于 React Query 的状态管理，提供智能缓存和自动重试
 - **文件处理** - 支持多种文件格式上传和处理
-- **图床服务** - 集成 SM.MS 图床，自动上传和 CDN 分发
+- **图床服务** - 集成 Cloudinary 图床，自动上传和 CDN 分发
 
 ## 🛠️ 技术栈
 
@@ -39,8 +39,8 @@
 ### 后端技术
 - Express.js
 - Neon PostgreSQL
-- SiliconFlow API
-- SM.MS 图床服务
+- Dify Workflows
+- Cloudinary
 
 ### 开发工具
 - Biome
@@ -77,8 +77,10 @@ DATABASE_URL=your_database_url
 # AI 服务
 SILICONFLOW_API_KEY=your_siliconflow_api_key
 
-# 图床服务
-SM_MS_TOKEN=your_sm_ms_token
+# Cloudinary
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
 ```
 
 ### 启动开发服务器

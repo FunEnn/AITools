@@ -1,4 +1,5 @@
 // This file is auto-generated. Do not edit manually.
+import prompts from "../prompts";
 export const ai = {
   totalCreations: "Total Creations",
   activePlan: "Active Plan",
@@ -28,8 +29,7 @@ export const ai = {
   writeArticle: {
     title: "Generated Article",
     placeholder: 'Enter a topic and click "Generate Article" to start',
-    promptTemplate:
-      'Please write a {length}-word article about "{topic}". The content should be detailed, well-structured, and logically rigorous.',
+    promptTemplate: prompts.en.writeArticle.promptTemplate,
     successMessage: "Article generated successfully!",
     errorMessage: "Failed to generate article, please try again",
     timeoutMessage:
@@ -40,8 +40,7 @@ export const ai = {
   blogTitles: {
     title: "Generated Titles",
     placeholder: 'Enter a topic and click "Generate Titles" to start',
-    promptTemplate:
-      'Please generate attractive titles for a {category} blog about "{topic}". The titles should be concise and compelling to attract readers.',
+    promptTemplate: prompts.en.blogTitles.promptTemplate,
     successMessage: "Titles generated successfully!",
     errorMessage: "Failed to generate titles, please try again",
     timeoutMessage:
@@ -85,6 +84,7 @@ export const ai = {
       title: "Resume Review Results",
       placeholder: 'Upload a resume and click "Review Resume" to start',
       inputError: "Please select a resume file",
+      promptTemplate: prompts.en.aiTools.resumeReview.promptTemplate,
       successMessage: "Resume review completed!",
       errorMessage: "Failed to review resume, please try again",
       generateError: "Error occurred while reviewing resume, please try again",
@@ -93,6 +93,7 @@ export const ai = {
       title: "Generated Image",
       placeholder: 'Enter a description and click "Generate Image" to start',
       inputError: "Please enter an image description",
+      promptTemplate: prompts.en.aiTools.imageGeneration.promptTemplate,
       successMessage: "Image generated successfully!",
       errorMessage: "Failed to generate image, please try again",
       timeoutMessage:

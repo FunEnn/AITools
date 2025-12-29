@@ -7,12 +7,10 @@ import AiToolForm from "@/components/ai-tools/AiToolForm";
 import AiToolLayout from "@/components/ai-tools/AiToolLayout";
 import AiToolResult from "@/components/ai-tools/AiToolResult";
 import { getImageGenerationFormConfig } from "@/components/ai-tools/formConfigs";
-import type { Lang } from "@/i18n";
 import { useAiApi } from "@/lib/useApi";
 
 interface GenerateImagesClientProps {
   dict: any;
-  lang: Lang;
 }
 
 export default function GenerateImagesClient({
@@ -43,7 +41,9 @@ export default function GenerateImagesClient({
     }
 
     try {
-      const prompt = `请生成一个${selectedStyle}风格的图像，描述：${input}。要求图像质量高，细节丰富。`;
+      const prompt = dict.ai.aiTools.imageGeneration.promptTemplate
+        .replace("{style}", selectedStyle)
+        .replace("{description}", input);
 
       const result = await generateImage.mutateAsync({
         prompt: prompt,

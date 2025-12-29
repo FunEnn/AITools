@@ -125,7 +125,7 @@ export default function CreationItem({
               />
             </div>
           ) : (
-            <div className="mt-3 h-full overflow-y-scroll text-sm text-slate-700">
+            <div className="mt-3 max-h-80 overflow-y-auto text-sm text-slate-700">
               <div className="reset-tw">
                 <Markdown>{item.content}</Markdown>
               </div>

@@ -18,8 +18,11 @@ EdgeOne Node Functions 后端代码。
 确保设置以下环境变量：
 
 - `DATABASE_URL` - 数据库连接字符串
-- `SILICONFLOW_API_KEY` - SiliconFlow API 密钥
-- `SM_MS_TOKEN` - SM.MS 图床服务令牌
+- `DIFY_API_KEY` - Dify API Key
+- `DIFY_BASE_URL` - Dify Base URL
+- `CLOUDINARY_CLOUD_NAME` - Cloudinary cloud name
+- `CLOUDINARY_API_KEY` - Cloudinary API key
+- `CLOUDINARY_API_SECRET` - Cloudinary API secret
 - `CLERK_SECRET_KEY` - Clerk 认证密钥
 
 ## 部署说明
@@ -35,4 +38,4 @@ EdgeOne Node Functions 后端代码。
 - 文件上传使用内存存储，适合 EdgeOne 环境
 - 认证使用 Clerk 中间件
 - 数据库使用 Neon PostgreSQL
-- 图像处理使用 SM.MS 图床服务
+- 图像处理使用 Cloudinary

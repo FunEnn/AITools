@@ -7,18 +7,13 @@ import AiToolForm from "@/components/ai-tools/AiToolForm";
 import AiToolLayout from "@/components/ai-tools/AiToolLayout";
 import AiToolResult from "@/components/ai-tools/AiToolResult";
 import { getBlogTitlesFormConfig } from "@/components/ai-tools/formConfigs";
-import type { Lang } from "@/i18n";
 import { useAiApi } from "@/lib/useApi";
 
 interface BlogTitlesClientProps {
   dict: any;
-  lang: Lang;
 }
 
-export default function BlogTitlesClient({
-  dict,
-  lang,
-}: BlogTitlesClientProps) {
+export default function BlogTitlesClient({ dict }: BlogTitlesClientProps) {
   const blogTitlesFormConfig = getBlogTitlesFormConfig(dict);
   const [selectedCategory, setSelectedCategory] = useState(
     blogTitlesFormConfig.options[0],
@@ -43,12 +38,9 @@ export default function BlogTitlesClient({
     }
 
     try {
-      const language = lang === "zh" ? "中文" : "English";
-      const prompt =
-        dict.ai.blogTitles.promptTemplate
-          .replace("{topic}", input)
-          .replace("{category}", selectedCategory) +
-        ` 请用${language}生成标题。`;
+      const prompt = dict.ai.blogTitles.promptTemplate
+        .replace("{topic}", input)
+        .replace("{category}", selectedCategory);
 
       const result = await generateBlogTitle.mutateAsync({ prompt });
 

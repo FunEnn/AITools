@@ -4,13 +4,7 @@ import { Mail } from "lucide-react";
 import { assets } from "@/assets/assets";
 import type { Dictionary } from "@/types/dictionary";
 
-export default function Privacy({
-  dict,
-  lang,
-}: {
-  dict: Dictionary;
-  lang: string;
-}) {
+export default function Privacy({ dict }: { dict: Dictionary }) {
   return (
     <div
       className="px-4 sm:px-20 xl:px-32 relative inline-flex flex-col w-full justify-center bg-cover bg-no-repeat min-h-screen pt-32 pb-24"

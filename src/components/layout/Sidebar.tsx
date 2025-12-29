@@ -2,13 +2,11 @@
 
 import { Protect, useClerk, useUser } from "@clerk/nextjs";
 import {
-  Eraser,
   FileText,
   Hash,
   Home,
   Image as ImageIcon,
   LogOut,
-  Scissors,
   SquarePen,
   Users,
 } from "lucide-react";
@@ -42,16 +40,6 @@ export default function Sidebar({
       to: `/${lang}/ai/generate-images`,
       label: dict.nav.generateImages,
       Icon: ImageIcon,
-    },
-    {
-      to: `/${lang}/ai/remove-background`,
-      label: dict.nav.removeBackground,
-      Icon: Eraser,
-    },
-    {
-      to: `/${lang}/ai/remove-object`,
-      label: dict.nav.removeObject,
-      Icon: Scissors,
     },
     {
       to: `/${lang}/ai/review-resume`,

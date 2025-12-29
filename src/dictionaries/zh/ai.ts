@@ -1,4 +1,5 @@
 // This file is auto-generated. Do not edit manually.
+import prompts from "../prompts";
 export const ai = {
   totalCreations: "总创作数",
   activePlan: "当前计划",
@@ -25,8 +26,7 @@ export const ai = {
   writeArticle: {
     title: "生成的文章",
     placeholder: '输入主题并点击"生成文章"开始',
-    promptTemplate:
-      '请写一篇关于"{topic}"的{length}字文章。要求内容详实、结构清晰、逻辑严谨。',
+    promptTemplate: prompts.zh.writeArticle.promptTemplate,
     successMessage: "文章生成成功！",
     errorMessage: "文章生成失败，请重试",
     timeoutMessage: "AI生成时间较长，请稍后重试",
@@ -36,8 +36,7 @@ export const ai = {
   blogTitles: {
     title: "生成的标题",
     placeholder: '输入主题并点击"生成标题"开始',
-    promptTemplate:
-      '请为关于"{topic}"的{category}博客生成吸引人的标题。要求标题简洁有力，能够吸引读者点击。',
+    promptTemplate: prompts.zh.blogTitles.promptTemplate,
     successMessage: "标题生成成功！",
     errorMessage: "标题生成失败，请重试",
     timeoutMessage: "AI生成时间较长，请稍后重试",
@@ -77,6 +76,7 @@ export const ai = {
       title: "简历审查结果",
       placeholder: '上传简历并点击"审查简历"开始',
       inputError: "请选择简历文件",
+      promptTemplate: prompts.zh.aiTools.resumeReview.promptTemplate,
       successMessage: "简历审查完成！",
       errorMessage: "简历审查失败，请重试",
       generateError: "审查简历时出错，请重试",
@@ -85,6 +85,7 @@ export const ai = {
       title: "生成的图像",
       placeholder: '输入描述并点击"生成图像"开始',
       inputError: "请输入图像描述",
+      promptTemplate: prompts.zh.aiTools.imageGeneration.promptTemplate,
       successMessage: "图像生成成功！",
       errorMessage: "图像生成失败，请重试",
       timeoutMessage: "AI生成时间较长，请稍后重试",

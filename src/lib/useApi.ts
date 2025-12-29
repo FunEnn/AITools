@@ -99,12 +99,6 @@ export const useAiApi = () => {
       queryClient.invalidateQueries({ queryKey: ["community", "published"] });
     },
   });
-  const removeBackground = useMutation({
-    mutationFn: api.ai.removeBackground,
-  });
-  const removeObject = useMutation({
-    mutationFn: api.ai.removeObject,
-  });
   const reviewResume = useMutation({
     mutationFn: api.ai.reviewResume,
   });
@@ -113,8 +107,6 @@ export const useAiApi = () => {
     generateArticle,
     generateBlogTitle,
     generateImage,
-    removeBackground,
-    removeObject,
     reviewResume,
   };
 };

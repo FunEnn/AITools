@@ -33,7 +33,6 @@ export interface Creation {
 // AI生成请求参数
 export interface GenerateArticleParams {
   prompt: string;
-  length?: string;
 }
 
 export interface GenerateBlogTitleParams {
@@ -45,18 +44,9 @@ export interface GenerateImageParams {
   publish?: boolean;
 }
 
-export interface RemoveBackgroundParams {
-  image: File;
-}
-
-export interface RemoveObjectParams {
-  image: File;
-  object: string;
-}
-
 export interface ResumeReviewParams {
   resume: File;
-  language?: string;
+  prompt: string;
 }
 
 // 用户相关API
@@ -82,63 +72,27 @@ export const userApi = {
   },
 };
 
-// 生成唯一请求ID的工具函数
-const generateRequestId = (): string => {
-  return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-};
-
 // AI工具相关API
 export const aiApi = {
   // 生成文章
   generateArticle: (
     params: GenerateArticleParams,
   ): Promise<{ success: boolean; content: string; message?: string }> => {
-    const requestId = generateRequestId();
-    return http.post("/ai/generate-article", { ...params, requestId });
+    return http.post("/ai/generate-article", params);
   },
 
   // 生成博客标题
   generateBlogTitle: (
     params: GenerateBlogTitleParams,
   ): Promise<{ success: boolean; content: string; message?: string }> => {
-    const requestId = generateRequestId();
-    return http.post("/ai/generate-blog-title", { ...params, requestId });
+    return http.post("/ai/generate-blog-title", params);
   },
 
   // 生成图片
   generateImage: (
     params: GenerateImageParams,
   ): Promise<{ success: boolean; content: string; message?: string }> => {
-    const requestId = generateRequestId();
-    return http.post("/ai/generate-image", { ...params, requestId });
-  },
-
-  // 移除背景
-  removeBackground: (
-    imageFile: File,
-  ): Promise<{ success: boolean; content: string; message?: string }> => {
-    const requestId = generateRequestId();
-    const formData = new FormData();
-    formData.append("image", imageFile);
-    formData.append("requestId", requestId);
-    return http.upload("/ai/remove-background", formData);
-  },
-
-  // 移除对象
-  removeObject: (
-    params: RemoveObjectParams,
-  ): Promise<{
-    success: boolean;
-    content: string;
-    removedObject?: string;
-    message?: string;
-  }> => {
-    const requestId = generateRequestId();
-    const formData = new FormData();
-    formData.append("image", params.image);
-    formData.append("object", params.object);
-    formData.append("requestId", requestId);
-    return http.upload("/ai/remove-object", formData);
+    return http.post("/ai/generate-image", params);
   },
 
   // 简历审查
@@ -150,13 +104,9 @@ export const aiApi = {
     reviewType?: string;
     message?: string;
   }> => {
-    const requestId = generateRequestId();
     const formData = new FormData();
     formData.append("resume", params.resume);
-    formData.append("requestId", requestId);
-    if (params.language) {
-      formData.append("language", params.language);
-    }
+    formData.append("prompt", params.prompt);
     return http.upload("/ai/resume-review", formData);
   },
 };

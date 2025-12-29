@@ -17,15 +17,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "s2.loli.net",
-      },
-      {
-        protocol: "https",
-        hostname: "i.loli.net",
-      },
-      {
-        protocol: "https",
-        hostname: "vip1.loli.net",
+        hostname: "res.cloudinary.com",
       },
     ],
   },

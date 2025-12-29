@@ -1,11 +1,4 @@
-import {
-  Eraser,
-  FileText,
-  Hash,
-  Image,
-  Scissors,
-  SquarePen,
-} from "lucide-react";
+import { FileText, Hash, Image, SquarePen } from "lucide-react";
 import arrow_icon from "./arrow_icon.svg";
 import gradientBackground from "./gradientBackground.png";
 import logo from "./logo.svg";
@@ -51,20 +44,6 @@ export const getAiToolsData = (dict, lang) => [
     Icon: Image,
     bg: { from: "#20C363", to: "#11B97E" },
     path: `/${lang}/ai/generate-images`,
-  },
-  {
-    title: dict.ai.aiToolsData.backgroundRemoval.title,
-    description: dict.ai.aiToolsData.backgroundRemoval.description,
-    Icon: Eraser,
-    bg: { from: "#F76C1C", to: "#F04A3C" },
-    path: `/${lang}/ai/remove-background`,
-  },
-  {
-    title: dict.ai.aiToolsData.objectRemoval.title,
-    description: dict.ai.aiToolsData.objectRemoval.description,
-    Icon: Scissors,
-    bg: { from: "#5C6AF1", to: "#427DF5" },
-    path: `/${lang}/ai/remove-object`,
   },
   {
     title: dict.ai.aiToolsData.resumeReview.title,

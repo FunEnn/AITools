@@ -7,18 +7,13 @@ import AiToolForm from "@/components/ai-tools/AiToolForm";
 import AiToolLayout from "@/components/ai-tools/AiToolLayout";
 import AiToolResult from "@/components/ai-tools/AiToolResult";
 import { getResumeReviewFormConfig } from "@/components/ai-tools/formConfigs";
-import type { Lang } from "@/i18n";
 import { useAiApi } from "@/lib/useApi";
 
 interface ReviewResumeClientProps {
   dict: Record<string, any>;
-  lang: Lang;
 }
 
-export default function ReviewResumeClient({
-  dict,
-  lang,
-}: ReviewResumeClientProps) {
+export default function ReviewResumeClient({ dict }: ReviewResumeClientProps) {
   const resumeReviewFormConfig = getResumeReviewFormConfig(dict);
   const [fileName, setFileName] = useState("");
   const [generatedContent, setGeneratedContent] = useState("");
@@ -41,9 +36,10 @@ export default function ReviewResumeClient({
     }
 
     try {
+      const promptTemplate = dict.ai.aiTools.resumeReview.promptTemplate;
       const result = await reviewResume.mutateAsync({
         resume: selectedFile,
-        language: lang,
+        prompt: promptTemplate,
       });
 
       if (result?.success && result.content) {

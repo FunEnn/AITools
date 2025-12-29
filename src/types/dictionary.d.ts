@@ -167,6 +167,7 @@ export interface Dictionary {
         title: string;
         placeholder: string;
         inputError: string;
+        promptTemplate: string;
         successMessage: string;
         errorMessage: string;
         generateError: string;
@@ -175,6 +176,7 @@ export interface Dictionary {
         title: string;
         placeholder: string;
         inputError: string;
+        promptTemplate: string;
         successMessage: string;
         errorMessage: string;
         timeoutMessage: string;

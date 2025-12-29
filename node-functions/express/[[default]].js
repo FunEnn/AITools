@@ -7,8 +7,6 @@ import {
   generateArticle,
   generateBlogTitle,
   generateImage,
-  removeImageBackground,
-  removeImageObject,
   resumeReview,
 } from "../controllers/aiController.js";
 import {
@@ -41,18 +39,6 @@ app.use(requireAuth());
 app.post("/api/ai/generate-article", auth, generateArticle);
 app.post("/api/ai/generate-blog-title", auth, generateBlogTitle);
 app.post("/api/ai/generate-image", auth, generateImage);
-app.post(
-  "/api/ai/remove-background",
-  auth,
-  upload.single("image"),
-  removeImageBackground,
-);
-app.post(
-  "/api/ai/remove-object",
-  auth,
-  upload.single("image"),
-  removeImageObject,
-);
 app.post("/api/ai/resume-review", auth, upload.single("resume"), resumeReview);
 
 // 用户相关路由

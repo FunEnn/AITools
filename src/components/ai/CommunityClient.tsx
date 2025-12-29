@@ -5,12 +5,10 @@ import { Heart } from "lucide-react";
 import Image from "next/image";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
-import type { Lang } from "@/i18n";
 import { useCommunityApi } from "@/lib/useApi";
 
 interface CommunityClientProps {
   dict: any;
-  lang: Lang;
 }
 
 export default function CommunityClient({ dict }: CommunityClientProps) {

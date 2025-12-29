@@ -1,12 +1,157 @@
+import crypto from "node:crypto";
 import { clerkClient } from "@clerk/express";
 import axios from "axios";
+import cloudinary from "../configs/cloudinary.js";
 import sql from "../configs/db.js";
-import smms from "../configs/sm_ms.js";
+
+const DIFY_TIMEOUT_MS = 180000;
+
+const getDifyBaseUrl = () =>
+  String(process.env.DIFY_BASE_URL || "https://api.dify.ai/v1").replace(
+    /\/$/,
+    "",
+  );
+
+const uploadDifyWorkflowFile = async ({
+  userId,
+  fileBuffer,
+  fileName,
+  fileMime,
+}) => {
+  const apiKey = process.env.DIFY_API_KEY;
+  if (!apiKey) {
+    throw new Error("缺少环境变量 DIFY_API_KEY");
+  }
+
+  const baseUrl = getDifyBaseUrl();
+  const candidateUrls = [
+    `${baseUrl}/workflows/files/upload`,
+    `${baseUrl}/files/upload`,
+  ];
+
+  const safeMime = (() => {
+    const ext = String(fileName || "")
+      .toLowerCase()
+      .split(".")
+      .pop();
+
+    if (fileMime && fileMime !== "application/octet-stream") return fileMime;
+
+    if (ext === "pdf") return "application/pdf";
+    if (ext === "md") return "text/markdown";
+    if (ext === "txt") return "text/plain";
+    if (ext === "doc") return "application/msword";
+    if (ext === "docx") {
+      return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    }
+
+    return fileMime || "application/octet-stream";
+  })();
+
+  let lastError = null;
+
+  for (const url of candidateUrls) {
+    const form = new FormData();
+    form.append("user", userId);
+    form.append("file", new Blob([fileBuffer], { type: safeMime }), fileName);
+
+    const resp = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: form,
+    });
+
+    const data = await resp.json().catch(() => null);
+    if (!resp.ok) {
+      lastError = new Error(
+        `Dify 文件上传失败(${resp.status})[${url}]: ${data?.message || data?.error || "unknown error"}`,
+      );
+      continue;
+    }
+
+    const fileId = data?.id || data?.upload_file_id;
+    if (!fileId) {
+      lastError = new Error(`Dify 文件上传返回缺少 id/upload_file_id[${url}]`);
+      continue;
+    }
+
+    return { data, fileId, uploadUrl: url };
+  }
+
+  throw (
+    lastError ||
+    new Error(
+      "Dify 文件上传失败：未命中可用上传接口（workflows/files/upload 或 files/upload）",
+    )
+  );
+};
+
+const inFlight = new Map();
+
+const hashText = (text) =>
+  crypto
+    .createHash("sha1")
+    .update(String(text || ""))
+    .digest("hex");
+
+const runOnce = async (key, fn) => {
+  if (inFlight.has(key)) {
+    return await inFlight.get(key);
+  }
+
+  const promise = (async () => await fn())().finally(() => {
+    inFlight.delete(key);
+  });
+
+  inFlight.set(key, promise);
+  return await promise;
+};
+
+const runDifyWorkflow = async ({ userId, inputs }) => {
+  const baseUrl = process.env.DIFY_BASE_URL || "https://api.dify.ai/v1";
+  const apiKey = process.env.DIFY_API_KEY;
+
+  if (!apiKey) {
+    throw new Error("Missing DIFY_API_KEY");
+  }
+
+  const url = `${baseUrl.replace(/\/$/, "")}/workflows/run`;
+
+  try {
+    const response = await axios.post(
+      url,
+      {
+        inputs,
+        response_mode: "blocking",
+        user: userId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        timeout: DIFY_TIMEOUT_MS,
+      },
+    );
+
+    return response.data;
+  } catch (err) {
+    const status = err?.response?.status;
+    const providerMessage =
+      err?.response?.data?.message || err?.response?.statusText;
+    const detail = providerMessage
+      ? `Dify 上游错误(${status || "unknown"}): ${providerMessage}`
+      : `Dify 请求失败(${status || "unknown"}): ${err?.message || "unknown"}`;
+    throw new Error(detail);
+  }
+};
 
 export const generateArticle = async (req, res) => {
   try {
     const { userId } = req.auth();
-    const { prompt, length, requestId } = req.body;
+    const { prompt } = req.body;
     const plan = req.plan;
     const free_usage = req.free_usage;
 
@@ -18,79 +163,41 @@ export const generateArticle = async (req, res) => {
       });
     }
 
-    if (requestId) {
-      try {
-        const existingResult = await sql`
-          SELECT content FROM request_cache 
-          WHERE request_id = ${requestId} AND user_id = ${userId}
-        `;
+    const dedupKey = `article:${userId}:${hashText(prompt)}`;
 
-        if (existingResult.length > 0) {
-          console.log(`🔄 返回缓存的文章生成结果: ${requestId}`);
-          return res.json({
-            success: true,
-            content: existingResult[0].content,
-            cached: true,
-          });
-        }
-      } catch (cacheError) {
-        console.warn("检查请求缓存时出错:", cacheError);
-      }
-    }
-
-    const response = await axios.post(
-      "https://api.siliconflow.cn/v1/chat/completions",
-      {
-        model: "Qwen/QwQ-32B",
-        messages: [
-          {
-            role: "user",
-            content: `请根据以下提示生成一篇${length || "中等长度"}的文章：${prompt}`,
-          },
-        ],
-        max_tokens: 4096,
-        temperature: 0.7,
-        top_p: 0.7,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.SILICONFLOW_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        timeout: 120000,
-      },
-    );
-
-    const content = response.data.choices[0].message.content;
-
-    await sql`INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, ${prompt}, ${content}, 'article')`;
-
-    if (requestId) {
-      try {
-        await sql`
-          INSERT INTO request_cache (request_id, user_id, content, created_at) 
-          VALUES (${requestId}, ${userId}, ${content}, NOW())
-          ON CONFLICT (request_id) DO NOTHING
-        `;
-        console.log(`💾 缓存文章生成结果: ${requestId}`);
-      } catch (cacheError) {
-        console.warn("缓存请求结果时出错:", cacheError);
-      }
-    }
-
-    // 更新用户免费使用次数
-    if (plan !== "premium") {
-      await clerkClient.users.updateUserMetadata(userId, {
-        privateMetadata: {
-          free_usage: free_usage + 1,
+    const result = await runOnce(dedupKey, async () => {
+      const difyData = await runDifyWorkflow({
+        userId,
+        inputs: {
+          action: "text",
+          tool: "article",
+          prompt,
         },
       });
-    }
 
-    res.json({
-      success: true,
-      content,
+      const outputs = difyData?.data?.outputs || difyData?.outputs || {};
+      const content = outputs.text;
+
+      if (!content) {
+        throw new Error(
+          "Dify 返回内容为空，请检查 workflow 输出字段是否为 text",
+        );
+      }
+
+      await sql`INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, ${prompt}, ${content}, 'article')`;
+
+      if (plan !== "premium") {
+        await clerkClient.users.updateUserMetadata(userId, {
+          privateMetadata: {
+            free_usage: free_usage + 1,
+          },
+        });
+      }
+
+      return { success: true, content };
     });
+
+    res.json(result);
   } catch (error) {
     console.error("AI 文章生成错误:", error);
     res.status(500).json({
@@ -103,7 +210,7 @@ export const generateArticle = async (req, res) => {
 export const generateBlogTitle = async (req, res) => {
   try {
     const { userId } = req.auth();
-    const { prompt, requestId } = req.body;
+    const { prompt } = req.body;
     const plan = req.plan;
     const free_usage = req.free_usage;
 
@@ -115,78 +222,41 @@ export const generateBlogTitle = async (req, res) => {
       });
     }
 
-    if (requestId) {
-      try {
-        const existingResult = await sql`
-          SELECT content FROM request_cache 
-          WHERE request_id = ${requestId} AND user_id = ${userId}
-        `;
+    const dedupKey = `blog_title:${userId}:${hashText(prompt)}`;
 
-        if (existingResult.length > 0) {
-          console.log(`🔄 返回缓存的博客标题生成结果: ${requestId}`);
-          return res.json({
-            success: true,
-            content: existingResult[0].content,
-            cached: true,
-          });
-        }
-      } catch (cacheError) {
-        console.warn("检查请求缓存时出错:", cacheError);
-      }
-    }
-
-    const response = await axios.post(
-      "https://api.siliconflow.cn/v1/chat/completions",
-      {
-        model: "Qwen/QwQ-32B",
-        messages: [
-          {
-            role: "user",
-            content: `请根据以下主题生成吸引人的博客标题：${prompt}。要求标题简洁有力，能够吸引读者点击。`,
-          },
-        ],
-        max_tokens: 500,
-        temperature: 0.8,
-        top_p: 0.9,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.SILICONFLOW_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-      },
-    );
-
-    const content = response.data.choices[0].message.content;
-
-    await sql`INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, ${prompt}, ${content}, 'blog-title')`;
-
-    if (requestId) {
-      try {
-        await sql`
-          INSERT INTO request_cache (request_id, user_id, content, created_at) 
-          VALUES (${requestId}, ${userId}, ${content}, NOW())
-          ON CONFLICT (request_id) DO NOTHING
-        `;
-        console.log(`💾 缓存博客标题生成结果: ${requestId}`);
-      } catch (cacheError) {
-        console.warn("缓存请求结果时出错:", cacheError);
-      }
-    }
-
-    // 更新用户免费使用次数
-    if (plan !== "premium") {
-      await clerkClient.users.updateUserMetadata(userId, {
-        privateMetadata: {
-          free_usage: free_usage + 1,
+    const result = await runOnce(dedupKey, async () => {
+      const difyData = await runDifyWorkflow({
+        userId,
+        inputs: {
+          action: "text",
+          tool: "blog_title",
+          prompt,
         },
       });
-    }
 
-    res.json({
-      success: true,
-      content,
+      const outputs = difyData?.data?.outputs || difyData?.outputs || {};
+      const content = outputs.text;
+
+      if (!content) {
+        throw new Error(
+          "Dify 返回内容为空，请检查 workflow 输出字段是否为 text",
+        );
+      }
+
+      await sql`INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, ${prompt}, ${content}, 'blog-title')`;
+
+      if (plan !== "premium") {
+        await clerkClient.users.updateUserMetadata(userId, {
+          privateMetadata: {
+            free_usage: free_usage + 1,
+          },
+        });
+      }
+
+      return { success: true, content };
     });
+
+    res.json(result);
   } catch (error) {
     console.error("AI 博客标题生成错误:", error);
     res.status(500).json({
@@ -199,7 +269,7 @@ export const generateBlogTitle = async (req, res) => {
 export const generateImage = async (req, res) => {
   try {
     const { userId } = req.auth();
-    const { prompt, publish, requestId } = req.body;
+    const { prompt, publish } = req.body;
     const plan = req.plan;
 
     if (plan !== "premium") {
@@ -209,74 +279,42 @@ export const generateImage = async (req, res) => {
       });
     }
 
-    if (requestId) {
-      try {
-        const existingResult = await sql`
-          SELECT content FROM request_cache 
-          WHERE request_id = ${requestId} AND user_id = ${userId}
-        `;
+    const dedupKey = `image:${userId}:${hashText(prompt)}:${publish ? "1" : "0"}`;
 
-        if (existingResult.length > 0) {
-          console.log(`🔄 返回缓存的图像生成结果: ${requestId}`);
-          return res.json({
-            success: true,
-            content: existingResult[0].content,
-            cached: true,
-          });
-        }
-      } catch (cacheError) {
-        console.warn("检查请求缓存时出错:", cacheError);
-      }
-    }
-
-    const response = await axios.post(
-      "https://api.siliconflow.cn/v1/images/generations",
-      {
-        model: "Kwai-Kolors/Kolors",
-        prompt: prompt,
-        image_size: "1024x1024",
-        batch_size: 1,
-        num_inference_steps: 20,
-        guidance_scale: 7.5,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.SILICONFLOW_API_KEY}`,
-          "Content-Type": "application/json",
+    const result = await runOnce(dedupKey, async () => {
+      const difyData = await runDifyWorkflow({
+        userId,
+        inputs: {
+          action: "image",
+          tool: "image_generation",
+          prompt,
         },
-      },
-    );
+      });
 
-    const imageUrl = response.data.images[0].url;
+      const outputs = difyData?.data?.outputs || difyData?.outputs || {};
+      const imageUrl = outputs.url;
 
-    const downloadResponse = await axios.get(imageUrl, {
-      responseType: "arraybuffer",
-    });
-    const imageBuffer = Buffer.from(downloadResponse.data);
-
-    const uploadedImageUrl = await smms.uploadImage(imageBuffer, {
-      filename: `ai-generated-${Date.now()}.png`,
-    });
-
-    await sql`INSERT INTO creations (user_id, prompt, content, type, publish) VALUES (${userId}, ${prompt}, ${uploadedImageUrl}, 'image', ${publish || false})`;
-
-    if (requestId) {
-      try {
-        await sql`
-          INSERT INTO request_cache (request_id, user_id, content, created_at) 
-          VALUES (${requestId}, ${userId}, ${uploadedImageUrl}, NOW())
-          ON CONFLICT (request_id) DO NOTHING
-        `;
-        console.log(`💾 缓存图像生成结果: ${requestId}`);
-      } catch (cacheError) {
-        console.warn("缓存请求结果时出错:", cacheError);
+      if (!imageUrl) {
+        throw new Error(
+          "Dify 返回图片地址为空，请检查 workflow 输出字段是否为 url",
+        );
       }
-    }
 
-    res.json({
-      success: true,
-      content: uploadedImageUrl,
+      const downloadResponse = await axios.get(imageUrl, {
+        responseType: "arraybuffer",
+      });
+      const imageBuffer = Buffer.from(downloadResponse.data);
+
+      const uploadedImageUrl = await cloudinary.uploadImage(imageBuffer, {
+        filename: `ai-generated-${Date.now()}.png`,
+      });
+
+      await sql`INSERT INTO creations (user_id, prompt, content, type, publish) VALUES (${userId}, ${prompt}, ${uploadedImageUrl}, 'image', ${publish || false})`;
+
+      return { success: true, content: uploadedImageUrl };
     });
+
+    res.json(result);
   } catch (error) {
     console.error("AI 图像生成错误:", error);
 
@@ -289,205 +327,17 @@ export const generateImage = async (req, res) => {
   }
 };
 
-export const removeImageBackground = async (req, res) => {
-  try {
-    const { userId } = req.auth();
-    const plan = req.plan;
-
-    if (plan !== "premium") {
-      return res.json({
-        success: false,
-        message: "背景移除功能仅限高级用户使用，请升级您的账户以解锁此功能。",
-      });
-    }
-
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: "请上传要处理的图像文件",
-      });
-    }
-
-    const imageBuffer = req.file.buffer;
-    const base64Image = `data:image/${req.file.mimetype.split("/")[1]};base64,${imageBuffer.toString("base64")}`;
-
-    const response = await axios.post(
-      "https://api.siliconflow.cn/v1/images/generations",
-      {
-        model: "Qwen/Qwen-Image-Edit-2509",
-        prompt:
-          "Create a clean image with transparent background, remove the background while keeping the main subject intact",
-        image: base64Image,
-        image_size: "1024x1024",
-        num_inference_steps: 20,
-        guidance_scale: 7.5,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.SILICONFLOW_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-      },
-    );
-
-    const processedImageUrl = response.data.images[0].url;
-
-    const downloadResponse = await axios.get(processedImageUrl, {
-      responseType: "arraybuffer",
-    });
-    const processedImageBuffer = Buffer.from(downloadResponse.data);
-
-    const uploadedImageUrl = await smms.uploadImage(processedImageBuffer, {
-      filename: `background-removed-${Date.now()}.png`,
-    });
-
-    await sql`INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, 'background_removal', ${uploadedImageUrl}, 'image')`;
-    res.json({
-      success: true,
-      content: uploadedImageUrl,
-    });
-  } catch (error) {
-    console.error("背景移除错误:", error);
-
-    let errorMessage = "背景移除服务暂时不可用，请稍后重试";
-
-    if (
-      error.response?.data?.message?.includes("prohibited or sensitive content")
-    ) {
-      errorMessage = "图片内容可能包含敏感信息，请尝试其他图片";
-    } else if (error.response?.data?.message?.includes("content")) {
-      errorMessage = "图片内容不符合处理要求，请尝试其他图片";
-    } else if (error.response?.data?.message) {
-      errorMessage = error.response.data.message;
-    }
-
-    res.status(500).json({
-      success: false,
-      message: errorMessage,
-    });
-  }
-};
-
-export const removeImageObject = async (req, res) => {
-  try {
-    const { userId } = req.auth();
-    const { object } = req.body;
-    const plan = req.plan;
-
-    if (plan !== "premium") {
-      return res.json({
-        success: false,
-        message: "对象移除功能仅限高级用户使用，请升级您的账户以解锁此功能。",
-      });
-    }
-
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: "请上传要处理的图像文件",
-      });
-    }
-
-    if (!object) {
-      return res.status(400).json({
-        success: false,
-        message: "请指定要移除的对象",
-      });
-    }
-
-    const imageBuffer = req.file.buffer;
-    const base64Image = `data:image/${req.file.mimetype.split("/")[1]};base64,${imageBuffer.toString("base64")}`;
-
-    const response = await axios.post(
-      "https://api.siliconflow.cn/v1/images/generations",
-      {
-        model: "Qwen/Qwen-Image-Edit-2509",
-        prompt: `Edit the image to remove the specified object: ${object}. Keep all other elements and background unchanged`,
-        image: base64Image,
-        image_size: "1024x1024",
-        num_inference_steps: 25,
-        guidance_scale: 8.0,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.SILICONFLOW_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-      },
-    );
-
-    const processedImageUrl = response.data.images[0].url;
-
-    const downloadResponse = await axios.get(processedImageUrl, {
-      responseType: "arraybuffer",
-    });
-    const processedImageBuffer = Buffer.from(downloadResponse.data);
-
-    const uploadedImageUrl = await smms.uploadImage(processedImageBuffer, {
-      filename: `object-removed-${Date.now()}.png`,
-    });
-
-    await sql`INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, ${`object_removal_${object}`}, ${uploadedImageUrl}, 'image')`;
-
-    res.json({
-      success: true,
-      content: uploadedImageUrl,
-      removedObject: object,
-    });
-  } catch (error) {
-    console.error("对象移除错误:", error);
-
-    let errorMessage = "对象移除服务暂时不可用，请稍后重试";
-
-    if (
-      error.response?.data?.message?.includes("prohibited or sensitive content")
-    ) {
-      errorMessage = "图片内容可能包含敏感信息，请尝试其他图片";
-    } else if (error.response?.data?.message?.includes("content")) {
-      errorMessage = "图片内容不符合处理要求，请尝试其他图片";
-    } else if (error.response?.data?.message) {
-      errorMessage = error.response.data.message;
-    }
-
-    res.status(500).json({
-      success: false,
-      message: errorMessage,
-    });
-  }
-};
-
 export const resumeReview = async (req, res) => {
   try {
     const { userId } = req.auth();
     const plan = req.plan;
-    const { language = "zh", requestId } = req.body;
+    const { prompt: promptTemplate } = req.body;
 
     if (plan !== "premium") {
       return res.json({
         success: false,
         message: "简历审查功能仅限高级用户使用，请升级您的账户以解锁此功能。",
       });
-    }
-
-    if (requestId) {
-      try {
-        const existingResult = await sql`
-          SELECT content FROM request_cache 
-          WHERE request_id = ${requestId} AND user_id = ${userId}
-        `;
-
-        if (existingResult.length > 0) {
-          console.log(`🔄 返回缓存的简历审查结果: ${requestId}`);
-          return res.json({
-            success: true,
-            content: existingResult[0].content,
-            reviewType: "resume",
-            cached: true,
-          });
-        }
-      } catch (cacheError) {
-        console.warn("检查请求缓存时出错:", cacheError);
-      }
     }
 
     if (!req.file) {
@@ -497,78 +347,58 @@ export const resumeReview = async (req, res) => {
       });
     }
 
+    if (!promptTemplate) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "缺少提示词模板（prompt），请从 dictionaries 传入 resumeReview.promptTemplate",
+      });
+    }
+
     const dataBuffer = req.file.buffer;
+    const fileName = req.file.originalname || `resume-${Date.now()}`;
+    const fileMime = req.file.mimetype || "application/octet-stream";
+    const fileSize = Number(req.file.size || dataBuffer?.length || 0);
+    const prompt = String(promptTemplate || "")
+      .trim()
+      .slice(0, 256);
 
-    const { default: pdfParse } = await import("pdf-parse-new");
-    const pdfData = await pdfParse(dataBuffer);
+    const difyFileType = "document";
 
-    const isEnglish = language === "en";
-    const prompt = isEnglish
-      ? `Please carefully review the following resume and provide constructive feedback, including:
+    const { fileId } = await uploadDifyWorkflowFile({
+      userId,
+      fileBuffer: dataBuffer,
+      fileName,
+      fileMime,
+    });
 
-1. Resume strengths and highlights
-2. Areas for improvement
-3. Format and structure suggestions
-4. Content completeness assessment
-5. Keyword optimization suggestions
-6. Overall rating (1-10 points)
-
-Resume content:
-${pdfData.text}
-
-Please respond in English and provide specific, practical suggestions.`
-      : `请仔细审查以下简历，并提供建设性的反馈意见，包括：
-
-1. 简历的优势和亮点
-2. 需要改进的地方
-3. 格式和结构建议
-4. 内容完整性评估
-5. 关键词优化建议
-6. 整体评分（1-10分）
-
-简历内容：
-${pdfData.text}
-
-请用中文回复，并提供具体、实用的建议。`;
-
-    const response = await axios.post(
-      "https://api.siliconflow.cn/v1/chat/completions",
-      {
-        model: "Qwen/QwQ-32B",
-        messages: [
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-        max_tokens: 2000,
-        temperature: 0.7,
-        top_p: 0.9,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.SILICONFLOW_API_KEY}`,
-          "Content-Type": "application/json",
+    const difyData = await runDifyWorkflow({
+      userId,
+      inputs: {
+        action: "file",
+        tool: "resume_review",
+        prompt,
+        file: {
+          type: difyFileType,
+          transfer_method: "local_file",
+          upload_file_id: fileId,
+          name: fileName,
+          size: fileSize,
         },
       },
-    );
+    });
 
-    const reviewContent = response.data.choices[0].message.content;
+    const outputs = difyData?.data?.outputs || difyData?.outputs || {};
+    const reviewContent = outputs.text;
+
+    if (!reviewContent) {
+      return res.status(500).json({
+        success: false,
+        message: "Dify 返回内容为空，请检查 workflow 输出字段是否为 text",
+      });
+    }
 
     await sql`INSERT INTO creations (user_id, prompt, content, type) VALUES (${userId}, 'resume_review', ${reviewContent}, 'resume-review')`;
-
-    if (requestId) {
-      try {
-        await sql`
-          INSERT INTO request_cache (request_id, user_id, content, created_at) 
-          VALUES (${requestId}, ${userId}, ${reviewContent}, NOW())
-          ON CONFLICT (request_id) DO NOTHING
-        `;
-        console.log(`💾 缓存简历审查结果: ${requestId}`);
-      } catch (cacheError) {
-        console.warn("缓存请求结果时出错:", cacheError);
-      }
-    }
 
     res.json({
       success: true,
